@@ -1,0 +1,20 @@
+
+
+
+header0 = 'OVATION Prime 2013 \n'
+header1 = 'Date Time: 2018-04-18 11:00:00 \n'
+header2 = 'Hemispheric Power:   25.001  \n'
+header3 = '-------------------\n Local_time Lat_mag     je_tot    je_diff    je_mono    je_wav     je_ions'
+
+
+#~ ofile_name = "C:/Users/SWPC1/Documents/Python/Ovation_Realtime/Output/Text/testfile.txt"
+#                      C:\Users\SWPC1\Documents\Python\Ovation_Realtime\Output\Text
+
+#~ ofile_name = 'c:/users/SWPC1/testoutput.txt'
+#~ print (ofile_name)
+
+
+header_all = header0 + header1 + header2 + header3
+
+ofile = open("C:/Users/SWPC1/Documents/Python/Ovation_Realtime/Output/Text/testfile.txt","w")
+ofile.write(header_all)
