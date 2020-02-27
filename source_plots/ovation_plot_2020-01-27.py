@@ -250,6 +250,8 @@ while run_date <= end_date:
 		X= glat
 		Y= glon
 		Z= aur.ravel()
+		
+		print ('Hellow world')
 
 		
 		
