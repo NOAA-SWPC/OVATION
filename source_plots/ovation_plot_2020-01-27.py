@@ -36,8 +36,8 @@ from matplotlib.figure import Figure
 #  ***************** Set Run Parameters  *************************
 
 Home_path = os.environ.get('Home_path','/home/rodney.viereck/python/ovation/source_plots/')
-Input_path = os.environ.get('Input_path','/home/rodney.viereck/python/ovation/Output/')
-Output_path = os.environ.get('Output_path','/home/rodney.viereck/python/ovation/Final_Output/Final_Images/')
+Input_path = os.environ.get('Input_path','/home/rodney.viereck/python/ovation/Output')
+Output_path = os.environ.get('Output_path','/home/rodney.viereck/python/ovation/Final_Output/Images/')
 
 
 run_realtime = os.environ.get('run_realtime',True)   #If = True, then run once and use the standard "latest" file from the ovation model
@@ -56,7 +56,7 @@ cadence = os.environ.get('cadence',60)		#minutes
 if run_realtime == True:
 	run_once = True
 	plot_south = True
-	Input_path = Input_path + '/Nowcast/Text/'
+	Input_path = Input_path + '/NOWCAST/Text/'
 else:
 	Input_path = Input_path + '/Historic/Text/'
 
@@ -146,8 +146,8 @@ while run_date <= end_date:
 	
 # 	 Generate input/output file names
 
-		ifl = 	'Ovation_Latest_aurora_N'
-		if NS == 1: ifl = 'Ovation_Latest_aurora_S'
+		ifl = 	'Ovation_Latest_aurora_N_'
+		if NS == 1: ifl = 'Ovation_Latest_aurora_S_'
 		
 		vlat = 80.
 		vlon = -100
@@ -250,8 +250,7 @@ while run_date <= end_date:
 		X= glat
 		Y= glon
 		Z= aur.ravel()
-		
-		print ('Hellow world')
+
 
 		
 		
@@ -365,16 +364,16 @@ while run_date <= end_date:
 		
 		#Upper Left
 		
-		plt.figtext(0.04,0.99,'NOAA Space Weather Prediction Center', color = 'yellow', size =16)
-		plt.figtext(0.04,0.953,'Aurora Forecast', color = 'yellow', size = 30,weight = 'bold')
-		plt.figtext(0.04,0.925, 'For %s (UTC)' % fdate.strftime("%Y-%m-%d %H:%M"),color='yellow',size = 16)
+		plt.figtext(0.09,0.98,'NOAA Space Weather Prediction Center', color = 'yellow', size =16)
+		plt.figtext(0.09,0.943,'Aurora Forecast', color = 'yellow', size = 30,weight = 'bold')
+		plt.figtext(0.09,0.915, 'For %s (UTC)' % fdate.strftime("%Y-%m-%d %H:%M"),color='yellow',size = 16)
 		
 		#~ Upper Right
 		
-		plt.figtext(0.99,0.93,'Hemispheric Power: %5.1f GW (Range 5 to 200)' %HP,color='yellow',size = 12,ha = 'right')
-		plt.figtext(0.99,0.95,'Estimated Kp: %1i (Range 0 to 9)' %int(Kp),color='yellow',size = 12,ha = 'right')	
-		plt.figtext(0.99,0.97,'Estimated G-Scale: %1i (Range 0 to 5)' %int(G),color='yellow',size = 12,ha = 'right')
-		plt.figtext(0.99,0.99,'Forecast Lead Time: %3i minutes' %int(lt), color = 'yellow', size =12, ha = 'right')
+		plt.figtext(0.99,0.92,'Hemispheric Power: %5.1f GW (Range 5 to 200)' %HP,color='yellow',size = 12,ha = 'right')
+		plt.figtext(0.99,0.94,'Estimated Kp: %1i (Range 0 to 9)' %int(Kp),color='yellow',size = 12,ha = 'right')	
+		plt.figtext(0.99,0.96,'Estimated G-Scale: %1i (Range 0 to 5)' %int(G),color='yellow',size = 12,ha = 'right')
+		plt.figtext(0.99,0.98,'Forecast Lead Time: %3i minutes' %int(lt), color = 'yellow', size =12, ha = 'right')
 		
 		# ~ Lower Right
 		
@@ -429,40 +428,60 @@ while run_date <= end_date:
 
 		ofile1 = Output_path+"temp.png"
  			
-		plt.savefig(ofile1 ,facecolor = 'black', edgecolor = 'black',bbox_inches = 'tight', pad_inches = 0)
+# 		plt.savefig(ofile1 ,facecolor = 'black', edgecolor = 'black',bbox_inches = 'tight', pad_inches = 0)
 
-		im = Image.open(ofile1)
+# 		im = Image.open(ofile1)
 
 
 # 
 		# ***********************   Reread temp image and Add NOAA Logo   **************************	
-		
-		icon = Image.open(Home_path + "NOAA_logo4.png")
-		icon_size = (90,90)
-		
-		icon2 = icon.resize(icon_size)
-		x,y = icon2.size
+# 		
+# 		icon = Image.open(Home_path + "NOAA_logo4.png")
+# 		icon_size = (70,70)
+# 		
+# 		icon2 = icon.resize(icon_size)
+# 		x,y = icon2.size
 		
 
 		
 # 		
 # 		#NOAA logo position
-		px = 20
-		py = 630
+# 		px = 20
+# 		py = 800
 # 		im.paste(icon2, (px, py, px + x, py + y), icon2)
 # 		im = im.convert('RGB')
 # 		
 # 		lgb = lgb.convert('RGB')
 		
-		lgb.figimage(icon ,xo = px, yo = py)
-		
-		plt.savefig(ofile1 ,facecolor = 'black', edgecolor = 'black',bbox_inches = 'tight', pad_inches = 0)
+# 		lgb.figimage(icon ,xo = px, yo = py)
+# 		
+# 		plt.savefig(ofile1 ,facecolor = 'black', edgecolor = 'black',bbox_inches = 'tight', pad_inches = 0)
 
 # 		
-# 		ofile = Output_path+ifl+'.png'
+		ofile = Output_path+ifl+'.png'
 # 		print (ofile)
 # # 			
 # 		im.save(ofile)
+		
+		
+	# ***********************    Add NOAA Logo to Earth Plot   **************************	
+	
+		icon = Image.open(Home_path + "NOAA_logo4.png")
+		icon_size = (65,65)
+		
+		icon2 = icon.resize(icon_size)
+		x,y = icon2.size
+		
+	# 		#NOAA logo position
+		px = 0
+		py = 730
+		
+		lgb.figimage(icon2 ,xo = px, yo = py)
+		
+		#Save Final Image to File
+	
+		plt.savefig(ofile1 ,facecolor = 'black', edgecolor = 'black',bbox_inches = 'tight', pad_inches = 0)
+
 	
 	run_date = run_date + dt.timedelta(minutes = cadence)
 	

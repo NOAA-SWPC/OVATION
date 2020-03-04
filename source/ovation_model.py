@@ -16,28 +16,17 @@
 
 #file:///C:/Users/rodney.viereck/AppData/Local/Continuum/miniconda2/pkgs/proj4-5.2.0-ha925a31_1/Library/share/epsg
 
+import os
 import datetime
-import numpy as np
+# import numpy as np
 #import matplotlib 
 import datetime as dt
 import math as math
-import configparser
-
-#matplotlib.use('Agg') # for running crontabs
-#import matplotlib.pyplot as plt
-#import matplotlib.lines as mlines
-#import matplotlib.colors as colors
-
-#~ import urllib
-
-#from mpl_toolkits.basemap import Basemap
-#from matplotlib.mlab import griddata
-#from scipy.ndimage.filters import uniform_filter, gaussian_filter, maximum_filter, generic_filter
-#from matplotlib import ticker
+# import configparser
 
 from swpc_get_solar_wind_realtime_data_json import swpc_get_solar_wind_realtime_data_json
 from swpc_get_Kp_forecast_data_json import swpc_get_Kp_forecast_data_json
-from solar_wind_coupling import sol_coup
+# from solar_wind_coupling import sol_coup
 from utilities_functions_season_epoch import prob_estimate, season_weights, mlt_bin, mlat_bin
 from season_epoch_Kp import season_epoch_Kp
 #from custom_cmap import make_colormap
@@ -61,47 +50,64 @@ from ovation_plot_geomag import ovation_plot_geomag
 #  'FORECAST' Requires 3 days of 3 hourly Kp forecast for input (24 Kp Values Total)
 #	Reads these data from the SWPC online database
 
-mode = 'HISTORIC'
 
+mode = os.environ.get('mode', 'NOWCAST')
 
-
-#**********    Read the Config File Input  *************************
+#************************    Set Variables  *************************
 #import configparser1
 
-# config_file = 'C:/Docs/Python/Ovation_New_Realtime_2019/Configuration/OVATION_Config.ini'
-config_file = '/home/rodney.viereck/python/ovation/configuration/OVATION_Config.ini'
+Home_path = os.environ.get('Home_path','/home/rodney.viereck/python/ovation/source/')
+SW_Data_path = os.environ.get('SW_Data_path', '/home/rodney.viereck/python/ovation/SW_Data/')
+dmsp_path = os.environ.get('dmsp_path', '/home/rodney.viereck/python/ovation/SW_Data/OP_DMSP_data/')
+guvi_path = os.environ.get('guvi_path', '/home/rodney.viereck/python/ovation/SW_Data/OP_GUVI_data/')
 
-config = configparser.ConfigParser()
-config.read(config_file)
+Output_path = os.environ.get('Output_path', '/home/rodney.viereck/python/ovation/Output/')
 
-Prime_path  = config.get('DEFAULT', 'Prime_Path')
-SW_Data_path = Prime_path + config.get('DEFAULT', 'SW_Data_path')
-dmsp_path = SW_Data_path + config.get('DEFAULT', 'dmsp_path')
-guvi_path = SW_Data_path + config.get('DEFAULT', 'guvi_path')
+input_file_historic = os.environ.get('input_file_historic', 'sw_data_2017_Sept.dat')
 
-Output_Path_text = Prime_path + config.get(mode, 'Output_Path_text')
-Output_path_images = Prime_path + config.get(mode, 'Output_Path_images')
+urlpath = os.environ.get('urlpath', 'http://services.swpc.noaa.gov/products/solar-wind/')
 
-urlpath = config.get('NOWCAST','urlpath')
+start_date = os.environ.get('start_date', datetime.datetime(2017,9,27,00,00))
+end_date = os.environ.get('end_date', datetime.datetime(2017,9,30,00,00))
+cadence = os.environ.get('cadence', 60)
 
-NorthSouth = 1
-if int(config.get('FLAGS', 'North_South')) == 1: NorthSouth = 2  #if NS = 1 then just do norther hemisphere.   Make NS = 2 for both hemispheres
+#Flags
+
+NorthSouth = os.environ.get('NorthSouth', True)  #If True then plot both hemisphere 
+Omni = os.environ.get('Omni', True)  #If, True, then use OMNI data... otherwise use a flat file
+image_output = os.environ.get('image_output', False)  #If True, then output images
+
+
+
+Output_Path_text = Output_path + mode + '/Text/'
+Output_path_images = Output_path + mode + '/Images/'
+
+#Clean out data from previous forecast
+
+if mode == 'FORECAST': 	os.system('rm ' + Output_Path_text + '/North/*.txt')
+
 
 nloops = 1
-if mode== 'FORECAST': loops = 24
 
-Omni = int(config.get('HISTORIC', 'Omni'))
+NS_loop = 1
+if NorthSouth == True: 
+	NS_loop = 2  #if NS = 1 then just do norther hemisphere.   Make NS = 2 for both hemispheres
+
+if mode == 'FORECAST': NS_loop = 1       #Don't calculate southern hemisphere
+
+time = datetime.datetime.utcnow() # Set Current Time
+
 
 Kp_1 = 0
 
 if mode == 'HISTORIC':
 
-	sd = config.get(mode,'start_date')
-	ed = config.get(mode,'end_date')
-	start_date = datetime.datetime(int(sd[0:4]),int(sd[5:7]),int(sd[8:10]),int(sd[11:13]),int(sd[14:16]))	
-	end_date = datetime.datetime(int(ed[0:4]),int(ed[5:7]),int(ed[8:10]),int(ed[11:13]),int(ed[14:16]))		
-	cadence = int(config.get(mode,'cadence'))						#Cadence in minutes)
-	Ifile = SW_Data_path + config.get('HISTORIC', 'input_file_historic')
+# 	sd = start_date
+# 	ed = end_date
+# 	start_date = datetime.datetime(int(sd[0:4]),int(sd[5:7]),int(sd[8:10]),int(sd[11:13]),int(sd[14:16]))	
+# 	end_date = datetime.datetime(int(ed[0:4]),int(ed[5:7]),int(ed[8:10]),int(ed[11:13]),int(ed[14:16]))		
+							#Cadence in minutes)
+	Ifile = SW_Data_path + input_file_historic
 
 	print ("Running in Historic Mode from - to ",start_date, end_date)
 	print ("Running at ", cadence, " minute cadence")
@@ -141,7 +147,8 @@ if mode == 'HISTORIC':
 
 if mode == 'FORECAST':
 	# *************   Get Forecasted Kp Data  ***********************
-	print ('Running in 3-Day Forecast Mode')
+# 	print ('Running in 3-Day Forecast Mode')
+	nloops = 24   #Loop through 3 days
 	
 	time_Kp, Kp = swpc_get_Kp_forecast_data_json()#	
 	sw_avg = { 'current_time' : time_Kp[0], 'time_latest_solar_wind' : time_Kp[0],  'forecast_time': time_Kp[-1], 'Bx' : 0, 'By' : 0, 'Bz' : 0, 'B_average' : 0, 'v' : 0, 'ni' : 0 }
@@ -156,10 +163,10 @@ if mode == 'FORECAST':
 #	sw_avg = { 'current_time' : cur_time, 'time_latest_solar_wind' : lsw_time,  'forecast_time': for_time, 'Bx' : 0, 'By' : 0, 'Bz' : 0, 'B_average' : 0, 'v' : 0, 'ni' : 0 }
 
 
-	nloops = len(Kp)
+# 	nloops = len(Kp)   #Loop more 
 
 
-print ('Number of Loops  ',nloops)
+# print ('Number of Loops  ',nloops)
 
 
 
@@ -168,8 +175,8 @@ for iloop in range(nloops):
 	if mode == 'NOWCAST':
 
 	# *************   Get Real_time Data  ***********************
-		print ('Running in Real-time Mode')
-		time = datetime.datetime.utcnow() # can be any time in the past 24hrs
+# 		print ('Running in Real-time Mode')
+# 		time = datetime.datetime.utcnow() # can be any time in the past 24hrs
 
 		#~ ***************  Get Realtime Input Data ********************
 		sw_avg = swpc_get_solar_wind_realtime_data_json(urlpath, mode, time)
@@ -213,7 +220,7 @@ for iloop in range(nloops):
 		
 
 		
-	for NS in range(NorthSouth):
+	for NS in range(NS_loop):
 
 			
 		if NS == 1:				#For southern hemisphere
@@ -270,22 +277,25 @@ for iloop in range(nloops):
 			Kp_1= int(t1*math.log(lnval))
 			if Kp_1 < 0.0: Kp_1 = 0.
 		
-			time_lab=time_sw
+			time_lab=time
 			time_for = sw_avg['forecast_time']
 		else:
 			time_for = time_Kp[iloop]
 			time_lab = time_for
 			
-		
-		print ("Time of Day  ",time_sw)
+		print ("Current Time ",time)
+		print ("Time of Last Solar Wind ",time_sw)
 		print ("Forecast Time", time_for)
+		print ('NS = ',NS)
+	
+	
 		
-		wf = write_ascii_file(NS,Output_Path_text,time_sw, time_for, time_lab, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1)
+		wf = write_ascii_file(mode,NS,Output_Path_text,time_sw, time_for, time_lab, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1)
 		
-		if NS != 1: ovation_plot_geomag(Output_Path_text,wf, Output_path_images+wf+'.jpg')
+		if image_output == False: ovation_plot_geomag(Output_Path_text,wf, Output_path_images+wf+'.jpg')
 
 																											
-print('Done with program')
+# print('Done with program')
 
 
 

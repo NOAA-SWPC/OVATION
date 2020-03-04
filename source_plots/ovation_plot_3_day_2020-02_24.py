@@ -95,7 +95,7 @@ mult_wave = 1.
 
 upper = 4.3		#Upper Limit for Aurora in plots	 in ergs/cm2/sec.   Setting this prevents the color map from wrapping
 
-fg_color = 'light_blue'	  #Set forground color
+# fg_color = 'light_light_blue'	  #Set forground color
 
 # ****************   Set the color scale for the aurora   ***************************
 #     Note, the Alpha term is for transparancy
@@ -366,19 +366,19 @@ for iloop in range(nloops):
 	
 	lt = (1/60.)*(fdate - mdate).seconds       #Forecast Lead Time
 	
-	text_color = "cyan"
+	text_color = (.7,1.,1.,1.)  #(r,g,b,alpha)
 	
 	#Upper Left
 	
-	plt.figtext(0.04,0.99,'NOAA Space Weather Prediction Center', color = text_color, size =16)
-	plt.figtext(0.04,0.953,'3-Day Aurora Forecast', color = text_color, size = 30,weight = 'bold')
-	plt.figtext(0.04,0.925, 'For %s (UTC)' % fdate.strftime("%Y-%m-%d %H:%M"),color=text_color,size = 16)
+	plt.figtext(0.09,0.98,'NOAA Space Weather Prediction Center', color = text_color, size =16)
+	plt.figtext(0.09,0.943,'3-Day Aurora Forecast', color = text_color, size = 30,weight = 'bold')
+	plt.figtext(0.09,0.915, 'For %s (UTC)' % fdate.strftime("%Y-%m-%d %H:%M"),color=text_color,size = 16)
 	
 	#~ Upper Right
 	
 # 	plt.figtext(0.99,0.93,'Hemispheric Power: %5.1f GW (Range 5 to 200)' %HP,color=text_color,size = 12,ha = 'right')
-	plt.figtext(0.99,0.99,'Forecasted Kp: %1i (Range 0 to 9)' %int(Kp),color=text_color,size = 12,ha = 'right')	
-	plt.figtext(0.99,0.97,'Forecasted G-Scale: %1i (Range 0 to 5)' %int(G),color=text_color,size = 12,ha = 'right')
+	plt.figtext(0.99,0.98,'Forecasted Kp: %1i (Range 0 to 9)' %int(Kp),color=text_color,size = 12,ha = 'right')	
+	plt.figtext(0.99,0.96,'Forecasted G-Scale: %1i (Range 0 to 5)' %int(G),color=text_color,size = 12,ha = 'right')
 # 		plt.figtext(0.99,0.99,'Forecast Lead Time: %3i minutes' %int(lt), color = 'yellow', size =12, ha = 'right')
 	
 	# ~ Lower Right
@@ -398,7 +398,7 @@ for iloop in range(nloops):
 	
 	#  **********************   Add and Label Colorbar.  ***********************
 
-	cax = plt.axes([0.05,0.02,0.30,0.025])
+	cax = plt.axes([0.05,0.0,0.30,0.022])
 	cb=plt.colorbar(cs,cax=cax,orientation = "horizontal", ticks= [1,2,3,4,5])
 
 
@@ -411,24 +411,24 @@ for iloop in range(nloops):
  		
 # 	plt.figtext(0.18,.00,'(erg/cm2)', color=fg_color,ha = "center",size =12)
 # 	plt.figtext(0.32,.04,'>4', color=fg_color,size =12)		
-	plt.figtext(0.2,.06,'Unlikely                     Likely', color = text_color,  ha = "center", size =14)
-	plt.figtext(0.2,.08,'Likelyhood of Aurora', color = text_color, size =16, ha = "center",weight = 'bold')
+	plt.figtext(0.2,.03,'Less likely                     More Likely', color = text_color,  ha = "center", size =11)
+	plt.figtext(0.2,.05,'Likelyhood of Aurora', color = text_color, size =16, ha = "center",weight = 'bold')
 
 
 # 
 	# ***********************    Add NOAA Logo to Earth Plot   **************************	
 	
 	icon = Image.open(Home_path + "NOAA_logo4.png")
-	icon_size = (90,90)
+	icon_size = (65,65)
 	
 	icon2 = icon.resize(icon_size)
 	x,y = icon2.size
 	
 # 		#NOAA logo position
-	px = 20
-	py = 630
+	px = 0
+	py = 750
 	
-	lgb.figimage(icon ,xo = px, yo = py)
+	lgb.figimage(icon2 ,xo = px, yo = py)
 	
 
 #  *************************   Save Graphics and Text *****************************
