@@ -84,12 +84,12 @@ image_output = os.environ.get('image_output', False)  #If True, then output imag
 Output_Path_text = Output_path + mode + '/Text/'
 # Create dirs if missing
 os.makedirs(Output_Path_text + 'North/', exist_ok=True)
-print("making directory path {}".format(Output_Path_text +'North/'))
+print("making directory path (if necessary) {}".format(Output_Path_text +'North/'))
 os.makedirs(Output_Path_text + 'South/', exist_ok=True)
-print("making directory path {}".format(Output_Path_text +'South/'))
+print("making directory path (if necessary) {}".format(Output_Path_text +'South/'))
 Output_path_images = Output_path + mode + '/Images/'
 os.makedirs(Output_path_images, exist_ok=True)
-print("making directory path {}".format(Output_path_images))
+print("making directory path (if necessary) {}".format(Output_path_images))
 
 #Clean out data from previous forecast
 
