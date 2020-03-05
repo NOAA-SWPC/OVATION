@@ -56,4 +56,8 @@ ENV DEBIAN_FRONTEND=dialog
 
 
 RUN pip install matplotlib numpy scipy
+
 USER $USERNAME
+
+RUN git config --global user.email "marcus.england@noaa.gov" \
+  && git config --global user.name "Marcus England"
