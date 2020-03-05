@@ -4,9 +4,9 @@ services:
     image: rhel7-workstation-lx.swpc.noaa.gov/ovation:latest
     build: .
     tty: true
-    #volumes:
-      # define NETCDF_IN in the .env file, which may be hidden by your os
-      #- ${NETCDF_IN}:/goes_netcdf_dir
+    volumes:
+      #host:container
+      - ./Output:/Output
     env_file:
       - ovation.env
     command: [ "python", "ovation_model.py" ]
