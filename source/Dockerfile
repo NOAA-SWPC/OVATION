@@ -11,3 +11,6 @@ RUN groupadd --gid $USER_GID $USERNAME \
 RUN pip --disable-pip-version-check --no-cache-dir install requests
 RUN pip --disable-pip-version-check --no-cache-dir install matplotlib numpy scipy
 USER $USERNAME
+
+# Add the source doe into the image
+COPY --chown=ovation:ovation . /
