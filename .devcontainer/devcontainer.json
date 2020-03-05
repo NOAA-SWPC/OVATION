@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.101.1/containers/alpine-3.10-git
 {
-	"name": "SWPC Python Alpine",
+	"name": "SWPC Python Slim Buster",
 	// Sets the run context to one level up instead of the .devcontainer folder.
 	"context": "..",
 
