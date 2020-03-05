@@ -67,8 +67,10 @@ input_file_historic = os.environ.get('input_file_historic', 'sw_data_2017_Sept.d
 
 urlpath = os.environ.get('urlpath', 'http://services.swpc.noaa.gov/products/solar-wind/')
 
-start_date = os.environ.get('start_date', datetime.datetime(2017,9,27,00,00))
-end_date = os.environ.get('end_date', datetime.datetime(2017,9,30,00,00))
+start_date = os.environ.get('start_date', '09-27-2017 00:00')
+start_date = datetime.datetime.strptime(start_date, '%m-%d-%Y %H:%M')
+end_date = os.environ.get('end_date', '09-30-2017 00:00')
+end_date = datetime.datetime.strptime(end_date, '%m-%d-%Y %H:%M')
 cadence = os.environ.get('cadence', 60)
 
 #Flags
