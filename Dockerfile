@@ -12,12 +12,8 @@ RUN pip --disable-pip-version-check --no-cache-dir install requests
 RUN pip --disable-pip-version-check --no-cache-dir install matplotlib numpy scipy
 
 # make necessary directories
-#RUN mkdir SW_Data && \
-#  mkdir configuration && \
-#  mkdir source_plots && \
 RUN mkdir Output
 RUN chown ovation:ovation Output
-#  mkdir source
 
 USER $USERNAME
 

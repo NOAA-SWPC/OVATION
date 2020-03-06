@@ -5,7 +5,7 @@ services:
     build: .
     tty: true
     volumes:
-      #host:container
+      #host:container - this will need ownership by the ovation user on the host
       - ./Output:/Output
     env_file:
       - ovation.env
