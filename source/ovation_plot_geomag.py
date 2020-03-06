@@ -46,6 +46,7 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 	fhead = input_file.readline()
 
 	# *************  Read Observation datetime *******************
+	#print("ovation_plot_geomag with ipath: {}, ifile: {}, ofile: {}".format(ipath, ifile, ofile))
 
 	fdatei = input_file.readline() .strip()
 	fdatei =fdatei.split()
@@ -332,6 +333,7 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 
 		plt.figtext(xx,yy,'Dawn',color='white', size = 8, ha='center')
 
+	#print("plot ofile: {}".format(ofile))
 	plt.savefig(ofile,facecolor = 'black', edgecolor = 'black')
 	plt.close()
 

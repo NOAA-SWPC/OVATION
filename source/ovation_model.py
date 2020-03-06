@@ -92,7 +92,7 @@ os.makedirs(Output_path_images, exist_ok=True)
 print("making directory path (if necessary) {}".format(Output_path_images))
 
 #Clean out data from previous forecast
-
+print("mode is: {}".format(mode))
 if mode == 'FORECAST': 	os.system('rm ' + Output_Path_text + '/North/*.txt')
 
 
@@ -302,8 +302,9 @@ for iloop in range(nloops):
 		wf = write_ascii_file(mode,NS,Output_Path_text,time_sw, time_for, time_lab, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1)
 
 		#if image_output == False: ovation_plot_geomag(Output_Path_text,wf, Output_path_images+wf+'.jpg')
-		print("image_output, Output_Path_text: {}, 2nd arg: {}".format(Output_Path_text, Output_path_images+wf+'.png'))
-		if image_output == False: ovation_plot_geomag(Output_Path_text,wf, Output_path_images+wf+'.png')
+		print("image_output: {}, Output_Path_text: {}, 2nd arg: {}".format(image_output, Output_Path_text, Output_path_images+wf+'.png'))
+		if image_output:
+			ovation_plot_geomag(Output_Path_text,wf, Output_path_images+wf+'.png')
 
 
-# print('Done with program')
+print('Done with program')

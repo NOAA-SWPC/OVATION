@@ -1,7 +1,7 @@
 FROM python:3.8-slim-buster
 
 ARG USERNAME=ovation
-ARG USER_UID=1001
+ARG USER_UID=1015
 ARG USER_GID=$USER_UID
 
 # Add ovation user/group
