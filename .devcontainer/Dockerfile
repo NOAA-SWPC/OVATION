@@ -28,7 +28,10 @@ RUN apt-get update \
     && apt-get -y install --no-install-recommends apt-utils dialog 2>&1 \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
-    && apt-get -y install git openssh-client iproute2 procps lsb-release \
+    && apt-get -y install git openssh-client iproute2 procps lsb-release gcc \
+    # Install PR0J for Ovation and wget for conda
+    && apt-get -y install proj-bin wget \
+    #
     #
     # Install pylint
     && pip --disable-pip-version-check --no-cache-dir install pylint \
@@ -50,12 +53,25 @@ RUN apt-get update \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
+ENV PATH /opt/conda/bin:$PATH
+
+# basemap can't be installed without conda
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh && \
+    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    echo "conda activate base" >> ~/.bashrc
+
 RUN pip --disable-pip-version-check --no-cache-dir install requests
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=dialog
 
+# Basemap
+RUN conda install -y -c anaconda basemap
+ENV PROJ_LIB=/usr/share/proj
 
-RUN pip install matplotlib numpy scipy
+RUN pip install matplotlib numpy scipy aacgmv2 image
 
 USER $USERNAME
 
