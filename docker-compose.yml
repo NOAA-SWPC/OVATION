@@ -9,5 +9,5 @@ services:
       - ./Output:/Output
     env_file:
       - ovation.env
-    command: [ "python", "ovation_model.py" ]
+    command: [ "/bin/bash", "driver.sh" ]
     restart: "no"
