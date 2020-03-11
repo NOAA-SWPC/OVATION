@@ -304,6 +304,3 @@ for iloop in range(nloops):
 		print("image_output: {}, Output_Path_text: {}, 2nd arg: {}".format(image_output, Output_Path_text, Output_path_images+wf+'.png'))
 		if image_output:
 			ovation_plot_geomag(Output_Path_text,wf, Output_path_images+wf+'.png')
-
-
-print('Done with program')
