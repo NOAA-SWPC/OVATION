@@ -17,7 +17,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Basemap
-RUN conda install -y -c anaconda basemap
+RUN conda install -y -c anaconda basemap \
+    && conda install -c conda-forge cartopy
+
 ENV PROJ_LIB=/usr/share/proj
 
 RUN /opt/conda/bin/pip --disable-pip-version-check --no-cache-dir install requests matplotlib numpy scipy aacgmv2 image

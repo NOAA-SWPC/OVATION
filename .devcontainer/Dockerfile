@@ -44,6 +44,7 @@ RUN apt-get update \
     #
     # Basemap
     && conda install -y -c anaconda basemap \
+    && conda install -c conda-forge cartopy \
     #
     # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.
     && groupadd --gid $USER_GID $USERNAME \
