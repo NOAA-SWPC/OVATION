@@ -482,7 +482,7 @@ while run_date <= end_date:
 
 
 # 	Increment run_date and return to top of loop
-	run_date = run_date + dt.timedelta(minutes = cadence)
+	run_date = run_date + dt.timedelta(minutes = int(cadence))
 
 
 	# im2.show()
