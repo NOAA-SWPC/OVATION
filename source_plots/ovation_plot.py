@@ -42,13 +42,16 @@ from PIL import Image
 
 
 #  ***************** Set Run Parameters  *************************
+#Home_path = os.environ.get('Home_path','./')
+#Input_path = os.environ.get('Input_path','../Output')
+#Output_path = os.environ.get('Output_path','../Output/NOWCAST')
 
 Home_path = os.environ.get('Home_path','./')
 Input_path = os.environ.get('Input_path','../Output')
 Output_path = os.environ.get('Output_path','../Output/NOWCAST')
-Logo_path = os.environ.get('Home_path') + 'logo/'
-Image_Output_path = os.environ.get('Output_path','Final_Output/Images/')
-Text_Output_path = os.environ.get('Output_path','Final_Output/Text/')
+Logo_path = os.environ.get('Logo_path','../logo/')
+Image_Output_path = Output_path + '/'
+Text_Output_path = Output_path  + '/'
 
 run_realtime = os.environ.get('run_realtime',True)   #If = True, then run once and use the standard "latest" file from the ovation model
 run_once = os.environ.get('run_once',False)  #If = True, then only plot one map or one pair of maps if plot_south = 1
@@ -188,7 +191,7 @@ while run_date <= end_date:
 		ihour = 0
 
 
-		input_file = open(Input_path + ifl + '.txt', 'r')
+		input_file = open(Input_path + ifl + '_.txt', 'r')
 
 #  Read Input File and Parse Critical Variables
 
