@@ -37,3 +37,4 @@ COPY --chown=ovation:ovation driver.sh .
 
 COPY --chown=ovation:ovation SW_Data SW_Data
 COPY --chown=ovation:ovation configuration configuration
+COPY --chown=ovation:ovation logo logo
