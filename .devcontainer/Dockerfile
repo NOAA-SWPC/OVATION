@@ -5,7 +5,10 @@
 
 # To fully customize the contents of this image, use the following Dockerfile instead:
 # https://github.com/microsoft/vscode-dev-containers/tree/v0.101.1/containers/alpine-3.10-git/.devcontainer/Dockerfile
-FROM python:3.8-slim-buster
+#FROM python:3.8-slim-buster
+# slim buster doesn't include conda and caused vs code issues when conda was installed manually
+FROM continuumio/anaconda3
+
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
@@ -29,16 +32,18 @@ RUN apt-get update \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
     && apt-get -y install git openssh-client iproute2 procps lsb-release gcc \
-    # Install PR0J for Ovation and wget for conda
-    && apt-get -y install proj-bin wget \
     #
+    # Install PR0J for Ovation and wget for conda
+    && apt-get -y install proj-bin \
     #
     # Install pylint
-    && pip --disable-pip-version-check --no-cache-dir install pylint \
+    && /opt/conda/bin/pip --disable-pip-version-check --no-cache-dir install pylint \
     #
-    # Update Python environment based on requirements.txt
-    # && pip --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
-    # && rm -rf /tmp/pip-tmp \
+    # Ovation dependencies
+    && /opt/conda/bin/pip install matplotlib numpy scipy aacgmv2 image requests \
+    #
+    # Basemap
+    && conda install -y -c anaconda basemap \
     #
     # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.
     && groupadd --gid $USER_GID $USERNAME \
@@ -53,25 +58,10 @@ RUN apt-get update \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-ENV PATH /opt/conda/bin:$PATH
-
-# basemap can't be installed without conda
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
-    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
-    rm ~/miniconda.sh && \
-    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
-    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    echo "conda activate base" >> ~/.bashrc
-
-RUN pip --disable-pip-version-check --no-cache-dir install requests
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=dialog
 
-# Basemap
-RUN conda install -y -c anaconda basemap
 ENV PROJ_LIB=/usr/share/proj
-
-RUN pip install matplotlib numpy scipy aacgmv2 image
 
 USER $USERNAME
 
