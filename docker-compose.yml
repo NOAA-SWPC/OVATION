@@ -10,4 +10,4 @@ services:
     env_file:
       - ovation.env
     command: [ "/bin/bash", "driver.sh" ]
-    restart: "no"
+    restart: "yes"
