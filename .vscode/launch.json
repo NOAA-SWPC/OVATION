@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/source"
-            //"cwd": "${workspaceFolder}/source_plot"
+            //"cwd": "${workspaceFolder}/source_plots"
         }
     ]
 }
