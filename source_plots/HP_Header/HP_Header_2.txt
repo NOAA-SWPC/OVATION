@@ -1,0 +1,12 @@
+#
+# Prepared by the U.S. Dept. of Commerce, NOAA, Space Weather Prediction Center.
+# Please send comments and suggestions to SWPC.CustomerSupport@noaa.gov
+#
+# Missing Data:  (n/a)
+# Cadence:   5 minutes
+#
+# Tabular Data Format
+#
+# Year-Month-Day Hour:Minute    North-Hemispheric-Power-Index-GigaWatts    South-Hemispheric-Power-Index-GigaWatts
+# YYYY-MM-DD HH:MM     NorthHPI(GW)    SouthHPI(GW)
+#----------------------------------------------------

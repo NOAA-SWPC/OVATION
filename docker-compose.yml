@@ -1,0 +1,13 @@
+version: '2.1'
+services:
+  ovation:
+    image: rhel7-workstation-lx.swpc.noaa.gov/ovation:latest
+    build: .
+    tty: true
+    volumes:
+      #host:container - this will need ownership by the ovation user on the host
+      - ./Output:/Output
+    env_file:
+      - ovation.env
+    command: [ "/bin/bash", "driver.sh" ]
+    restart: unless-stopped

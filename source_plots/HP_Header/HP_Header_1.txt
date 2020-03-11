@@ -1,0 +1,4 @@
+#Aurora Hemispheric Power Tabular Values
+# Product: Ovation Aurora Short Term Forecast    http://services.swpc.noaa.gov/text/aurora-nowcast-hemi-power.txt
+# Timestamp is the valid time of a 30 minute forecast
+# This file contains data for 

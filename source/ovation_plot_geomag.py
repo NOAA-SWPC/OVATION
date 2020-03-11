@@ -22,13 +22,13 @@ def cart2polar(x, y):
     r = np.sqrt(x**2 + y**2)
     theta = np.arctan2(y, x)
     return r, theta
-	
+
 def polar2cart(r, theta):
     x = r * np.cos(theta)
     y = r * np.sin(theta)
     return x, y
-	
-	
+
+
 def ovation_plot_geomag (ipath,ifile,ofile):
 
 # ******************	Open and read the file created by the Ovation Model**************
@@ -38,11 +38,15 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 
 	#~ input_file = open(Input_path + Input_file, 'r')
 
-	input_file = open(ipath+ 'North/'+ ifile+'.txt','r')
+	if ifile.find('aurora_N') != -1:
+		input_file = open(ipath+ 'North/'+ ifile+'.txt','r')
+	else:
+		input_file = open(ipath+ 'South/'+ ifile+'.txt','r')
 
 	fhead = input_file.readline()
 
 	# *************  Read Observation datetime *******************
+	#print("ovation_plot_geomag with ipath: {}, ifile: {}, ofile: {}".format(ipath, ifile, ofile))
 
 	fdatei = input_file.readline() .strip()
 	fdatei =fdatei.split()
@@ -117,13 +121,13 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 			je_m[ilat,ilon] = (float(row[3]))
 			je_w[ilat,ilon] = (float(row[4]))
 			je_i[ilat,ilon] = (float(row[5]))
-			
+
 			mlat[ilat,ilon] = (float(row[1]))
 			if mlat[ilat,ilon] < 0: mlat[ilat,ilon] = -mlat[ilat,ilon]
 			mlon[ilat,ilon] = -90. + (float(row[0]))* 15 #-dec_time)*15. + 71.#Convert local time into longitude but keep local noon at time
-		
+
 			itot = itot+1
-			
+
 
 	for ilat in range(0,numlat):
 		mlat[(ilat,96)] = mlat[(ilat,0)]
@@ -132,7 +136,7 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 
 	#***************   Remove Outliers  *******************************
 	#~ mv = np.median(je_w)
-	#~ je_w = np.where(je_w < 1000*mv, je_w, mv)		#Remove really big spikes		
+	#~ je_w = np.where(je_w < 1000*mv, je_w, mv)		#Remove really big spikes
 	#~ temp = 1.3* gaussian_filter(je_w,sigma = 5,mode = 'wrap')	  #Establish a smooth background
 	#~ mv = np.median(temp)
 	#~ je_w = np.where((je_w - temp) <4*mv,  je_w, temp)			#Replace with smoothed where outlier
@@ -160,7 +164,7 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 	#~ print (np.amax(je_w))
 	#~ print (np.amax(je_i))
 	#~ print (np.amax(aur))
-		
+
 	#~ plt.plot(je_d[:,10])
 	#~ plt.show()
 	#~ quit()
@@ -196,14 +200,14 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 			je_dif.append(je_d[ix,iy])
 			je_mon.append(je_m[ix,iy])
 			je_wav.append(je_w[ix,iy])
-			je_ion.append(je_i[ix,iy])		
-			
+			je_ion.append(je_i[ix,iy])
+
 			polygon = Polygon([vert1,vert2,vert3,vert4],closed=True)
 			patches.append(polygon)
 
 
 	#  ****************	Define color map and color table **************
-			 
+
 	cdict1 = {'red':  ((0.0, 0.0, 0.0),
 						   (0.1, 0.0, 0.0),
 						   (0.25, 0.0, 0.0),
@@ -225,15 +229,15 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 						   (0.75, 0.0, 0.0),
 						   (1.0, 0.0, 0.0)),
 					}
-						   
+
 				#~ 'alpha': ((0.0, 1.0, 1.0),
-						   #~ (0.1, 1.0, 1.0),			
+						   #~ (0.1, 1.0, 1.0),
 						   #~ (0.25, 1.0, 1.0),
 						   #~ (0.5, 1.0, 1.0),
 						   #~ (0.75, 1.0, 1.0),
 						   #~ (1.0, 1.0, 1.0))
 					#~ }
-			
+
 	auro_col = LinearSegmentedColormap('aurora_color',cdict1)
 	plt.register_cmap(cmap=auro_col)
 	colormap=plt.get_cmap('aurora_color')
@@ -315,7 +319,7 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 
 	for ix in range(4):
 		yy = fig_cent[ix,0] + dx
-		xx = fig_cent[ix,1] 
+		xx = fig_cent[ix,1]
 
 		plt.figtext(xx,yy,'Noon',color='white', size = 8, ha='center')
 		yy = fig_cent[ix,0] - dx
@@ -325,14 +329,12 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 		yy = fig_cent[ix,0]
 
 		plt.figtext(xx,yy,'Dusk',color='white', size = 8, ha='center')
-		xx = fig_cent[ix,1] + dy 
+		xx = fig_cent[ix,1] + dy
 
 		plt.figtext(xx,yy,'Dawn',color='white', size = 8, ha='center')
 
+	#print("plot ofile: {}".format(ofile))
 	plt.savefig(ofile,facecolor = 'black', edgecolor = 'black')
 	plt.close()
-	
+
 #	plt.show()
-
-
-
