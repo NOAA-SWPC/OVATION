@@ -2,6 +2,7 @@
 
 ## Prerequisites
 
+1. An "ovation" user and group with gid and uid's of 1015 are required on the target host - best to deploy in the ovation user's home directory
 1. This project contains a .devcontainer directory for VS Code -- opening the main project folder in VS Code will give the option to develop in a container
 
 ## Environment variables
