@@ -1,0 +1,6 @@
+#Run the Ovation plotting routine
+#redirect output to a log file
+
+/home/rodney.viereck/miniconda3/bin/python3.7 /home/rodney.viereck/python/ovation_2020/source_plots/ovation_plot.py >> /home/rodney.viereck/run_ovation_plots.log
+
+

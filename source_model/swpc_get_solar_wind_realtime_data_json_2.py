@@ -179,6 +179,7 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 
 	density = np.asarray(density)
 	speed = np.asarray(speed)
+	
 
     #print 'Array lengths', len(Bx), len(speed), len(density)
 
@@ -260,8 +261,6 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 	else:
 		gse_y_interp = np.linspace( gse_y, before_gse_y, len(speed) )
 
-	delta_t = compute_lag( speed, time_sw, gse_x_interp, gse_y_interp )
-    #print 'lag time', delta_t
 
     #######################################################################
     # 4 Hourly Averages
@@ -275,22 +274,17 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 	time_diff = []
     #print time_sw
 	for i in time_sw:
-		time_diff.append((current_time - i).seconds) #current time changes every second
-    #print 'time_diff', time_diff
-	seconds_to_impact = delta_t - time_diff[0:len(delta_t)]
-    #print 'Seconds to impact', seconds_to_impact
+		time_diff.append((1/60.)*((current_time - i).seconds)) #current time changes every second
+	time_diff = np.array(time_diff)
 
-    #  set the averaging epoch time: Forecast or Nowcast
-	if mode == 'NOWCAST':
-		seconds_epoch = 0
-	else:
-		seconds_epoch = np.nanmax(seconds_to_impact) # excludes nan values
 
     # time of latest solar wind observation
 	time_latest_solar_wind = time_sw[-1]
-	solar_wind_seconds_latent = (current_time-time_latest_solar_wind).seconds
+	solar_wind_minute_latent = (1/60.) * (current_time-time_latest_solar_wind).seconds
 
-	print ('time latest solar wind ',time_latest_solar_wind)
+	print ('Time latest solar wind ',time_latest_solar_wind)
+	print('Data Latency (minutes) ' , solar_wind_minute_latent)
+	
 	
 	n_hours = 4 # data averaged over 4 hourly bins
 	Bx_average = []
@@ -299,9 +293,11 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 	Bmag_avg = []
 	v_avg = []
 	density_avg = []
-	sec_avg = []
+# 	sec_avg = []
 	for i in range(n_hours):
-		idx_hour = np.where( np.logical_and( seconds_to_impact >= (seconds_epoch-(i+1)*3600), seconds_to_impact<(seconds_epoch-i*3600) ) )
+# 		idx_hour = np.where( np.logical_and( seconds_to_impact >= (seconds_epoch-(i+1)*60), seconds_to_impact<(seconds_epoch-(i)*60) ) )
+
+		idx_hour = np.where( np.logical_and( (time_diff - time_diff[-1]) >= ((i)*60.), (time_diff - time_diff[-1]) <((i+1)*60.) ) )
 
 		Bx_average.append( np.nanmean(Bx[idx_hour]) ) # excluding nans
 		By_average.append( np.nanmean(By[idx_hour]) )
@@ -309,19 +305,20 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 		Bmag_avg.append( np.sqrt( Bx_average[i]**2 + By_average[i]**2 + Bz_average[i]**2 ))
 		v_avg.append( np.nanmean(speed[idx_hour]) )
 		density_avg.append( np.nanmean(density[idx_hour]) )
-		sec_avg.append( np.nanmean(seconds_to_impact[idx_hour]) )
-
+# 		sec_avg.append( np.nanmean(seconds_to_impact[idx_hour]) )
+		
+		
         # FORECAST mode?
         # forecast window average uses first hour of data
-		if i==0:
-			forecast_avg = np.average( delta_t[idx_hour] - solar_wind_seconds_latent )/60
-			forecast_min = np.min( delta_t[idx_hour] - solar_wind_seconds_latent )/60
-			forecast_max = np.max( delta_t[idx_hour] - solar_wind_seconds_latent )/60
-			forecast_std = np.std( delta_t[idx_hour] - solar_wind_seconds_latent )/60
+# 		if i==0:
+# 			forecast_avg = np.average( delta_t[idx_hour] - solar_wind_seconds_latent )/60
+# 			forecast_min = np.min( delta_t[idx_hour] - solar_wind_seconds_latent )/60
+# 			forecast_max = np.max( delta_t[idx_hour] - solar_wind_seconds_latent )/60
+# 			forecast_std = np.std( delta_t[idx_hour] - solar_wind_seconds_latent )/60
 
 
-	lead_time = 1.5e6/v_avg[-1]
-	print ('Lead time (minutes)  ',lead_time/60.)
+	lead_time = int(1.5e6/v_avg[-1])
+	print ('Lead time (minutes)  ',int(lead_time/60.))
 	forecast_time = time_sw[-1] + datetime.timedelta(seconds = lead_time)
 
 	

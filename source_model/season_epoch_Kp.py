@@ -22,10 +22,23 @@ from extrapolate_gap import extrapolate_gap
 from simple_smooth_j import simple_smooth_j
 from s_and_p import s_and_p
 from spike_removal import spike_removal
+from swpc_get_Kp_NOWCAST_data_json import swpc_get_Kp_NOWCAST_data_json
+
+
+import cProfile
+ 
+# pr = cProfile.Profile()
+# pr.enable()
+ 
+# call_function()
+ 
+# pr.disable()
+ 
+# pr.print_stats(sort='time')
 
 
 # paths needed to access the regression fits: premodel
-premodel_path = 'premodel/'
+# premodel_path = 'premodel/'
 
 # Interpolated solar wind hourly averages
 # This auroral power version uses a weighted average over last 4 hours
@@ -86,7 +99,7 @@ def ap_inter_sol_realtime(sw_avg):
 # Based on IDL code by Patrick Newell. Last updated May 2013
 
 def get_dmsp_smooth(dmsp_path, dFdt, day_of_year):
-	#~ print ('Entering get_dmsp_smooth')
+
 
 	nmlt = 96					 #15 min MLT grid
 	nmlat = 160				   #50-90 south, 50-90 north, step 0.5
@@ -117,6 +130,7 @@ def get_dmsp_smooth(dmsp_path, dFdt, day_of_year):
 	b2a = np.zeros((4,4,nmlt,nmlat))
 	b1n = np.zeros((4,4,nmlt,nmlat))
 	b2n = np.zeros((4,4,nmlt,nmlat)) # iseason,atype,nmlt,nmlat
+
 
 	
 	for atype in range(4): #loop on electron auroral types
@@ -165,6 +179,8 @@ def get_dmsp_smooth(dmsp_path, dFdt, day_of_year):
 							Prob_all[iseason,atype,0:ndF-1,i,j] = float(l)
 
 			# now read in regression coefficients for auroral flux
+
+		
 			
 			with open( afile, 'r') as f:
 				# reading just the first line in the file
@@ -189,7 +205,10 @@ def get_dmsp_smooth(dmsp_path, dFdt, day_of_year):
 					b1a[iseason,atype,i,j] = b1
 					b2a[iseason,atype,i,j] = b2
 
-			
+
+
+
+						
 			#number flux regress
 			with open( nafile, 'r') as f:
 				fline=f.readline().rstrip()
@@ -224,6 +243,7 @@ def get_dmsp_smooth(dmsp_path, dFdt, day_of_year):
 			b2a_temp[:,:] = b2a[iseason,atype,:,:]
 			b1n_temp[:,:] = b1n[iseason,atype,:,:]
 			b2n_temp[:,:] = b2n[iseason,atype,:,:]
+
 
 			if atype <= 2:
 				b1p_temp[:,:] = b1p[iseason,atype,:,:]
@@ -289,8 +309,8 @@ def get_dmsp_smooth(dmsp_path, dFdt, day_of_year):
 			
 			Prob = np.zeros((3,ndF,nmlt,nmlat))
 			Prob[:,:,:,:] = Prob_all[iseason,:,:,:,:]
-			
-	
+
+
 	for e_or_n in range(2):		#energy then number flux
 		for atype in range(4):
 
@@ -395,15 +415,17 @@ def get_dmsp_smooth(dmsp_path, dFdt, day_of_year):
 			# end of aurora type loop
 			# end of number or energy flux loop
 	
-#	plt.subplot(2,2,1)
-#	plt.imshow(je_a[0,:,:])
-#	plt.subplot(2,2,2)
-#	plt.imshow(je_a[1,:,:])
-#	plt.subplot(2,2,3)
-#	plt.imshow(je_a[2,:,:])
-#	plt.subplot(2,2,4)
-#	plt.imshow(je_a[3,:,:])
-#	plt.show()
+# 	plt.subplot(2,2,1)
+# 	plt.imshow(je_a[0,:,:])
+# 	plt.subplot(2,2,2)
+# 	plt.imshow(je_a[1,:,:])
+# 	plt.subplot(2,2,3)
+# 	plt.imshow(je_a[2,:,:])
+# 	plt.subplot(2,2,4)
+# 	plt.imshow(je_a[3,:,:])
+# 	plt.show()
+
+
 
 	return je_a, jn_a
 
@@ -567,7 +589,7 @@ def combined_get(dmsp_path, guvi_path, dFdt, day_of_year):
 	jea_dmsp,jna_dmsp = get_dmsp_smooth( dmsp_path, dFdt, day_of_year )
 
 	# if below treshold, only use DMSP data
-	print ('dFdt', dFdt)
+# 	print ('Solar Wind Energy Transfer Function dFdt = ', int(dFdt))
 	#dFdt = 11000.
 	if dFdt < dFdt_change:
 		je_a = jea_dmsp
@@ -685,18 +707,23 @@ def season_epoch_Kp(dmsp_path, guvi_path, sw_avg, mode, day_of_year,Kp_1):
     #    ********************    Convert from KP to Solar Wind Transfer Value  ********
 		dFdt =  800.  -  224. * Kp_1    +  1154. * Kp_1**2  -   124. * Kp_1**3 + 20. *Kp_1**4
 	else:
-		if len(sw_avg)>0:
-			# calculating interpolated solar wind hourly averages and coupling founction
-			Bmag,Bx,By,Bz,v,ni,Ec=ap_inter_sol_realtime(sw_avg)
-		else:
-			print ('No real-time data available... ')
 
-		dFdt = Ec[19] # the 20th value of the coupling function is used
+		if len(sw_avg) > 0:
+			Bmag,Bx,By,Bz,v,ni,Ec=ap_inter_sol_realtime(sw_avg)  #calculating interpolated solar wind hourly averages and coupling founction
+# 			Bmag = 0
+
+		if len(sw_avg) == 0 or Bmag == 0:
+			print ('No real-time data available...  Using real-time Kp to run the model')
+			time_now = datetime.datetime.utcnow() # Set Current Time
+			
+			time_Kp, Kp_1 , time_issue = swpc_get_Kp_NOWCAST_data_json()	
+			sw_avg = { 'current_time' : time_now, 'time_latest_solar_wind' : time_issue,  'forecast_time': time_Kp, 'Bx' : 0, 'By' : 0, 'Bz' : 0, 'B_average' : 0, 'v' : 0, 'ni' : 0 }			
+			dFdt =  800.  -  224. * Kp_1    +  1154. * Kp_1**2  -   124. * Kp_1**3 + 20. *Kp_1**4
+		else:
+			dFdt = Ec[19] # the 20th value of the coupling function is used
 
 	# check for magnetic field value
-		if Bmag == 0 :
-			print('No IMF data avaialble for the model...', sw_avg['time_latest_solar_wind'].date)
-			return
+
 
 	je_a, jn_a = combined_get(dmsp_path, guvi_path, dFdt,day_of_year)
 	

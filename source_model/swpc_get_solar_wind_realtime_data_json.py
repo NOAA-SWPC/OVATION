@@ -15,7 +15,7 @@ import numpy as np
 
 import requests
 
-import json
+# import json
 
 # proxy settings for use of real time system behind a firewall
 #~ proxy  = urllib2.ProxyHandler({'http':'http://webproxy.metoffice.gov.uk:8080'})
@@ -51,7 +51,6 @@ def compute_lag(v_sw, jtime, gse_x, gse_y):
     v_sw = np.asarray(v_sw)
     gse_x = np.asarray(gse_x)
     gse_y = np.asarray(gse_y) # need to be in array format to check for nans
-
     
     for i in range(n):
         # if i-th Vsw is NaN, then compute an average Vsw from nearest non NaN neighbors
@@ -102,11 +101,11 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 
 	#current date of realtime observations
 	current_time = time
-	current_date = current_time.strftime('%Y%m%d') # text file format
+# 	current_date = current_time.strftime('%Y%m%d') # text file format
 	#how long before the observation
 	minutes_before = 270 # 4.5 hours;
 	start_time = current_time - datetime.timedelta(minutes=minutes_before)
-	end_time = current_time
+# 	end_time = current_time
 
 ##############################################################
 # get realtime solar wind data between start_time and end_time
@@ -180,8 +179,13 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 
 	density = np.asarray(density)
 	speed = np.asarray(speed)
-
-    #print 'Array lengths', len(Bx), len(speed), len(density)
+	
+	if len(Bx) > len(speed):
+		ls = len(speed)
+		Bx = Bx[0:ls]
+		By = By[0:ls]
+		Bz = Bz[0:ls]
+# 	print( 'Array lengths', len(Bx), len(speed), len(density))
 
     # when no realtime solar wind data available, stop the code
 #	print(len(Bx),len(density))
@@ -217,12 +221,12 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
     #print 'Current hour/Time array', current_hour, time_a
 	if current_hour in time_arr:
 		ind = time_arr.index( current_hour )
-		time_loc = time_arr[ind]
+# 		time_loc = time_arr[ind]
 		gse_x = float(data_loc[ind][1])/Re
 		gse_y = float(data_loc[ind][2])/Re
 			
 		# get previous row of solar wind locations; one hour earlier for interpolation purpose
-		before_time_loc = time_arr[ind-1]
+# 		before_time_loc = time_arr[ind-1]
 		before_gse_x = float(data_loc[ind-1][1])/Re
 		before_gse_y = float(data_loc[ind-1][2])/Re
 			
@@ -230,12 +234,12 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
     # get latest available location; locations in Earth radii
 	else:
 		print('No real time location available, getting latest available spacecraft location...')
-		time_loc = time_arr[-1]
+# 		time_loc = time_arr[-1]
 		gse_x = float(data_loc[-1][1])/Re
 		gse_y = float(data_loc[-1][2])/Re
 			
 		# get previous row of solar wind locations; one hour earlier for interpolation purpose
-		before_time_loc = time_arr[-2]
+# 		before_time_loc = time_arr[-2]
 		before_gse_x = float(data_loc[-2][1])/Re
 		before_gse_y = float(data_loc[-2][2])/Re
 
@@ -268,30 +272,31 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
     # 4 Hourly Averages
     # starting with:
     #   Forecast Mode: most futuristic impact time, i.e. slowest solar wind
-    #   Nowcast Mode: solar wind arriving at Earth, now
+    #   Nowcast Mode: latest data
     #######################################################################
 
 
     # seconds to impact Earth from Now
 	time_diff = []
-    #print time_sw
+
 	for i in time_sw:
 		time_diff.append((current_time - i).seconds) #current time changes every second
-    #print 'time_diff', time_diff
-	seconds_to_impact = delta_t - time_diff[0:len(delta_t)]
-    #print 'Seconds to impact', seconds_to_impact
+	time_diff = -1 * np.array(time_diff)
 
     #  set the averaging epoch time: Forecast or Nowcast
 	if mode == 'NOWCAST':
-		seconds_epoch = 0
+		seconds_epoch = 0  #epoch is now for NOWCAST
+		seconds_to_impact = time_diff
 	else:
+		seconds_to_impact = delta_t + time_diff[0:len(delta_t)]
 		seconds_epoch = np.nanmax(seconds_to_impact) # excludes nan values
 
     # time of latest solar wind observation
+ 
 	time_latest_solar_wind = time_sw[-1]
-	solar_wind_seconds_latent = (current_time-time_latest_solar_wind).seconds
 
-# 	print ("time latest solar wind ",time_latest_solar_wind)
+	print ('Current time ', time, '  Latest solar wind ',time_latest_solar_wind)
+
 	
 	n_hours = 4 # data averaged over 4 hourly bins
 	Bx_average = []
@@ -301,12 +306,11 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 	v_avg = []
 	density_avg = []
 	sec_avg = []
+	
+
+	
 	for i in range(n_hours):
 		idx_hour = np.where( np.logical_and( seconds_to_impact >= (seconds_epoch-(i+1)*3600), seconds_to_impact<(seconds_epoch-i*3600) ) )
-
-		print( idx_hour,Bx[idx_hour], Bx_average)
-		stop()
-		
 		Bx_average.append( np.nanmean(Bx[idx_hour]) ) # excluding nans
 		By_average.append( np.nanmean(By[idx_hour]) )
 		Bz_average.append( np.nanmean(Bz[idx_hour]) )
@@ -315,22 +319,38 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 		density_avg.append( np.nanmean(density[idx_hour]) )
 		sec_avg.append( np.nanmean(seconds_to_impact[idx_hour]) )
 
-        # FORECAST mode?
-        # forecast window average uses first hour of data
-		if i==0:
-			forecast_avg = np.average( delta_t[idx_hour] - solar_wind_seconds_latent )/60
-			forecast_min = np.min( delta_t[idx_hour] - solar_wind_seconds_latent )/60
-			forecast_max = np.max( delta_t[idx_hour] - solar_wind_seconds_latent )/60
-			forecast_std = np.std( delta_t[idx_hour] - solar_wind_seconds_latent )/60
-
-
-	lead_time = 1.5e6/v_avg[-1]
-	print ('Lead time (minutes)  ',lead_time/60.)
-	forecast_time = time_sw[-1] + datetime.timedelta(seconds = lead_time)
-
+		
+# 	**************  Fill in Missing Data with adjacent or with averages  ***************************
+#   *       First try to fill missing data with more recent data
+#   *       If themost recent hour of solar wind data  are not avaialbe, set the whole array to zeros    
+#   ***********************************************************************************************	
 	
-    # final solar wind data structure
-#	sw_avg = { 'current_time' : current_time, 'time_latest_solar_wind' : time_latest_solar_wind, 'Bx' : Bx_average, 'By' : By_average, 'Bz' : Bz_average, 'B_average' : Bmag_avg, 'v' : v_avg, 'ni' : density_avg }
+	Bmag_avg[0] = float("nan")   #Uncomment this line to test the Kp backup option
+					 
+	for i in range(n_hours):
+		if np.isnan(Bmag_avg[i]):
+			print('Missing Data: Attempting to fill gaps for element ',i)
+			if i > 0 and np.isnan(Bmag_avg[i-1]) == False:
+				Bx_average[i] = Bx_average[i-1]
+				By_average[i] = By_average[i-1]
+				Bz_average[i] = Bz_average[i-1]
+				Bmag_avg[i] = ( np.sqrt( Bx_average[i]**2 + By_average[i]**2 + Bz_average[i]**2 ))
+				v_avg[i] = v_avg[i-1]
+				density_avg[i] = density_avg[i-1]
+				
+	if np.isnan(Bmag_avg[0]) or Bmag_avg[0] == [0]: 
+		Bx_average = np.zeros(n_hours)
+		By_average = np.zeros(n_hours)
+		Bz_average = np.zeros(n_hours)
+		Bmag_avg = np.zeros(n_hours)
+		v_avg = np.zeros(n_hours)
+		density_avg = np.zeros(n_hours)
+		forecast_time = time_latest_solar_wind
+	else:
+		lead_time = int(1.5e6/v_avg[-1])
+		print ('Forecast Lead time (minutes)  ',int(lead_time/60.))
+		forecast_time = time_sw[-1] + datetime.timedelta(seconds = lead_time)
+	
 	sw_avg = { 'current_time' : current_time, 'time_latest_solar_wind' : time_latest_solar_wind,  'forecast_time': forecast_time, 'Bx' : Bx_average, 'By' : By_average, 'Bz' : Bz_average, 'B_average' : Bmag_avg, 'v' : v_avg, 'ni' : density_avg }
 
 	return sw_avg

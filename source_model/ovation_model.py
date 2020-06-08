@@ -36,10 +36,11 @@ from get_solar_wind_historic_data_new import get_solar_wind_historic_data
 from get_solar_wind_omni import get_solar_wind_omni
 from rem_out import rem_out
 from ovation_plot_geomag import ovation_plot_geomag
+from write_HP_file_model import write_HP_file
 
 #***************************   Set Run Mode  *******************************
 
-# forecast mode: 'FORECAST' or 'NOWCAST' or 'HISTORIC'
+# OVATION mode: 'FORECAST' or 'NOWCAST' or 'HISTORIC'
 #  'HISTORIC' loops through specific dates in the past... must have access to a file with
 #	historic solar wind data.  Could be an OMNI file or it could be an ASCII file with
 #   just the required parameters of Velocity, Dentisy, Bz
@@ -47,65 +48,103 @@ from ovation_plot_geomag import ovation_plot_geomag
 #  'NOWCAST" uses latest solar wind values to provide a short range forecast.
 #	Reads data from real-time JSON files at SWPC
 
-#  'FORECAST' Requires 3 days of 3 hourly Kp forecast for input (24 Kp Values Total)
+#  'FORECAST' Requires upt to 3 days of 3 hourly Kp forecast for input (24 Kp Values Total)
 #	Reads these data from the SWPC online database
 
 
-mode = os.environ.get('mode', 'NOWCAST')
+mode = os.environ.get('mode', 'HISTORIC')
+
+print("mode is: {}".format(mode))
 
 #************************    Set Variables  *************************
-#import configparser1
+
+# Set Paths
 
 Home_path = os.environ.get('Home_path','.')
 SW_Data_path = os.environ.get('SW_Data_path', '../SW_Data/')
 dmsp_path = os.environ.get('dmsp_path', '../SW_Data/OP_DMSP_data/')
 guvi_path = os.environ.get('guvi_path', '../SW_Data/OP_GUVI_data/')
+header_path = os.environ.get('header_path', '../SW_Data/Header_Text/')
 
-Output_path = os.environ.get('Output_path', '../Output/')
+Output_path = os.environ.get('Output_path', '../output/')
 
-input_file_historic = os.environ.get('input_file_historic', 'sw_data_2017_Sept.dat')
+input_file_historic = os.environ.get('input_file_historic', 'Historic_SW_Data/sw_data_2017_Sept.dat')
 
 urlpath = os.environ.get('urlpath', 'http://services.swpc.noaa.gov/products/solar-wind/')
 
-start_date = os.environ.get('start_date', '09-27-2017 00:00')
+
+start_date = os.environ.get('start_date', '09-03-2017 00:00')
 start_date = datetime.datetime.strptime(start_date, '%m-%d-%Y %H:%M')
-end_date = os.environ.get('end_date', '09-30-2017 00:00')
+end_date = os.environ.get('end_date', '09-10-2017 01:00')
 end_date = datetime.datetime.strptime(end_date, '%m-%d-%Y %H:%M')
-cadence = os.environ.get('cadence', 60)
+cadence = os.environ.get('cadence', 30)   #Cadence in Minutes
 
-#Flags
+#Set Run Option Flags
 
-NorthSouth = os.environ.get('NorthSouth', True)  #If True then plot both hemisphere
-Omni = os.environ.get('Omni', True)  #If, True, then use OMNI data... otherwise use a flat file
-image_output = os.environ.get('image_output', False)  #If True, then output images
+Omni = os.environ.get('Omni', False)  #If, True, then use OMNI data... otherwise use a flat file
+NorthSouth = os.environ.get('NorthSouth', False)  #If True then plot both hemisphereal
+image_output = os.environ.get('image_output', False)  #If True, then output geomag coordinate quadplot images
+HPI_output = os.environ.get('HPI_output', True)  # If True then output Hemispheric Power Index to a file
+aurora_output = os.environ.get('aurora_output', False)  # If True, the output the aurora ASCII file
+
+if mode == 'FORECAST': HPI_output = False
+num_forecast_days = os.environ.get('num_forecast_days', 1)  #Set the number of days to forecast (must be less than 3)
+
+Output_Path_text = Output_path + mode + '/model_output/'
+HP_Output_path = Output_path + mode + '/ovation_products/hpi_text/'
+Output_path_images = Output_Path_text + '/graphic/'
+
+# Create directories if missing
+
+os.makedirs(Output_Path_text + 'north/', exist_ok=True)
+print("making directory path (if necessary) {}".format(Output_Path_text +'north/'))
+os.makedirs(Output_Path_text + 'south/', exist_ok=True)
+print("making directory path (if necessary) {}".format(Output_Path_text +'south/'))
+if image_output:
+	os.makedirs(Output_Path_text + 'graphic/', exist_ok=True)
+	print("making directory path (if necessary) {}".format(Output_Path_text +'graphic/'))
+if HPI_output:
+ 	os.makedirs(Output_path + mode + '/ovation_products/hpi_text/', exist_ok=True)
+ 	print("making directory path (if necessary) {}".format(Output_path + mode + '/ovation_products/hpi_text/'))
 
 
+#Clean out FORECAST data from previous forecast
 
-Output_Path_text = Output_path + mode + '/Text/'
-# Create dirs if missing
-os.makedirs(Output_Path_text + 'North/', exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_Path_text +'North/'))
-os.makedirs(Output_Path_text + 'South/', exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_Path_text +'South/'))
-Output_path_images = Output_path + mode + '/Images/'
-os.makedirs(Output_path_images, exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_path_images))
+if mode == 'FORECAST':
+	os.system('rm ' + Output_Path_text + 'north/*.txt')
+	os.system('rm ' + Output_Path_text + 'south/*.txt')
 
-#Clean out data from previous forecast
-print("mode is: {}".format(mode))
-if mode == 'FORECAST': 	os.system('rm ' + Output_Path_text + '/North/*.txt')
+if mode == 'HISTORIC':
+	print('Do you want to delete existing files from previous runs?')
 
+	answer = None
+	while answer not in ("yes", "no"):
+		answer = input("Enter yes or no: ")
+		if answer == "yes":
+			os.system('rm ' + Output_Path_text + 'north/*.txt')
+			os.system('rm ' + Output_Path_text + 'south/*.txt')
+			os.system('rm ' + HP_Output_path + '*.txt')
+		elif answer == "no":
+			print("May overwrite or append to existing files")
+		else:
+			print("Please enter yes or no.")
+			
+# os.system('rm ' + Output_Path_text + 'north/*.txt')
+# os.system('rm ' + Output_Path_text + 'south/*.txt')
+# os.system('rm ' + HP_Output_path + '*.txt')
 
+#  nloops is the number of times the model will be run (times 2 for North and South)
+#	  HISTORIC mode it will depend on length of period and cadence
+# 	  NOWCAST mode nloops will be 1
+# 	  FORECAST mode nloops will be 8 times per day times the number of days in the forecast
+	
 nloops = 1
 
 NS_loop = 1
 if NorthSouth == True:
 	NS_loop = 2  #if NS = 1 then just do norther hemisphere.   Make NS = 2 for both hemispheres
 
-if mode == 'FORECAST': NS_loop = 1       #Don't calculate southern hemisphere
-
-time = datetime.datetime.utcnow() # Set Current Time
-
+time_now = datetime.datetime.utcnow() # Set Current Time
 
 Kp_1 = 0
 
@@ -156,11 +195,17 @@ if mode == 'HISTORIC':
 
 if mode == 'FORECAST':
 	# *************   Get Forecasted Kp Data  ***********************
-# 	print ('Running in 3-Day Forecast Mode')
-	nloops = 24   #Loop through 3 days
+# 	print ('Running in Multi-Day Forecast Mode')
 
-	time_Kp, Kp = swpc_get_Kp_forecast_data_json()#
-	sw_avg = { 'current_time' : time_Kp[0], 'time_latest_solar_wind' : time_Kp[0],  'forecast_time': time_Kp[-1], 'Bx' : 0, 'By' : 0, 'Bz' : 0, 'B_average' : 0, 'v' : 0, 'ni' : 0 }
+	time_Kp, Kp , time_issue = swpc_get_Kp_forecast_data_json()
+	
+	sw_avg = { 'current_time' : time_now, 'time_latest_solar_wind' : time_issue,  'forecast_time': time_Kp[-1], 'Bx' : 0, 'By' : 0, 'Bz' : 0, 'B_average' : 0, 'v' : 0, 'ni' : 0 }
+
+	nloops = num_forecast_days * 8
+	if nloops > len(Kp):
+		nloops = len(Kp)
+		
+# 	nloops = 5 #override for testing
 
 #	To force a run status, uncomment the following lines and comment the previous two
 
@@ -172,11 +217,7 @@ if mode == 'FORECAST':
 #	sw_avg = { 'current_time' : cur_time, 'time_latest_solar_wind' : lsw_time,  'forecast_time': for_time, 'Bx' : 0, 'By' : 0, 'Bz' : 0, 'B_average' : 0, 'v' : 0, 'ni' : 0 }
 
 
-# 	nloops = len(Kp)   #Loop more
-
-
-# print ('Number of Loops  ',nloops)
-
+#   *************  Done with setup....   start running the model  ***************************888888
 
 
 for iloop in range(nloops):
@@ -188,7 +229,7 @@ for iloop in range(nloops):
 # 		time = datetime.datetime.utcnow() # can be any time in the past 24hrs
 
 		#~ ***************  Get Realtime Input Data ********************
-		sw_avg = swpc_get_solar_wind_realtime_data_json(urlpath, mode, time)
+		sw_avg = swpc_get_solar_wind_realtime_data_json(urlpath, mode, time_now)
 		# ***************************************************************
 
 	if mode == 'HISTORIC':
@@ -219,7 +260,7 @@ for iloop in range(nloops):
 
 	if mode == 'FORECAST':
 		Kp_1 = int(Kp[iloop])
-		time_sw = time_Kp[0]
+		time_sw = time_issue
 		time_for = time_Kp[iloop]
 		day_of_year = time_for.timetuple().tm_yday
 
@@ -248,9 +289,6 @@ for iloop in range(nloops):
 
 		#***************************************************************
 
-# 		# combining all 4 auroral types
-# 		je_combined = je[0,:,:] + je[1,:,:] + je[2,:,:]  + je[3,:,:]
-# 		je_sum =  je[0,:,:] + je[1,:,:] + je[2,:,:] #   Electrons Only
 
 
 	# ************   Call Routine to Calculate Hemispheric Power  ******
@@ -268,6 +306,8 @@ for iloop in range(nloops):
 			print ('North hemispheric power:  %6.1f ' %power_hemi)
 		else:
 			print ('South hemispheric power:  %6.1f ' %power_hemi)
+			
+		if HPI_output: write_HP_file(power_hemi, HP_Output_path, header_path, sw_avg['time_latest_solar_wind'], NS, NorthSouth, mode)
 
 	#  ******************  Write Data to File  *****************************
 
@@ -286,21 +326,34 @@ for iloop in range(nloops):
 			Kp_1= int(t1*math.log(lnval))
 			if Kp_1 < 0.0: Kp_1 = 0.
 
-			time_lab=time
+# 			time_lab=time_now
+			time_lab = time_sw
 			time_for = sw_avg['forecast_time']
+			
 		else:
 			time_for = time_Kp[iloop]
 			time_lab = time_for
 
-		print ("Current Time ",time)
-		print ("Time of Last Solar Wind ",time_sw)
+
+
+		lbl_1 = "Time of Last Solar Wind "
+		if mode == 'FORECAST': lbl_1 = "Time Kp Forecast was Issued "
+# 		print ("Current Time ",time_now)
+# 		print (lbl_1 ,time_sw)
 		print ("Forecast Time", time_for)
 		print ('NS = ',NS)
 
+		if aurora_output: wf = write_ascii_file(mode,NS,Output_Path_text,time_sw, time_for, time_lab, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1)
 
 
-		wf = write_ascii_file(mode,NS,Output_Path_text,time_sw, time_for, time_lab, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1)
 
-		print("image_output: {}, Output_Path_text: {}, 2nd arg: {}".format(image_output, Output_Path_text, Output_path_images+wf+'.png'))
+#  ***************************  Create Image Files If Flag is Set  ***********************
+# 		                           Not Requred for Operations
+		
+		
+# 		print("image_output: {}, Output_Path_text: {}, 2nd arg: {}".format(image_output, Output_Path_text, Output_path_images+wf+'.png'))
 		if image_output:
+			print("image_output: {}, Output_Path_text: {}, 2nd arg: {}".format(image_output, Output_Path_text, Output_path_images+wf+'.png'))
+			os.makedirs(Output_path_images, exist_ok=True)
+			print("making directory path (if necessary) {}".format(Output_path_images))
 			ovation_plot_geomag(Output_Path_text,wf, Output_path_images+wf+'.png')

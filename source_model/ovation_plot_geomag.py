@@ -266,7 +266,8 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 	ax1.axes.get_yaxis().set_visible(False)
 	ax1.axes.labelcolor = 'white'
 	circle = plt.Circle((10,10),100, color='white')
-	plt.colorbar()
+	cbar = plt.colorbar()
+	plt.setp(plt.getp(cbar.ax.axes, 'yticklabels'), color='white')
 
 	Z=np.asarray(je_m)
 	Z=np.where(Z > 0., Z, 0)
@@ -275,7 +276,9 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 	ax1 = plt.pcolormesh(X,Y,Z,vmin = pmin, vmax = pmax, cmap=colormap)
 	ax1.axes.get_xaxis().set_visible(False)
 	ax1.axes.get_yaxis().set_visible(False)
-	plt.colorbar()
+	
+	cbar = plt.colorbar()
+	plt.setp(plt.getp(cbar.ax.axes, 'yticklabels'), color='white')
 
 	Z=np.asarray(je_w)
 	Z=np.where(Z > 0., Z, 0)
@@ -284,7 +287,8 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 	ax1 = plt.pcolormesh(X,Y,Z,vmin = pmin, vmax = pmax, cmap=colormap)
 	ax1.axes.get_xaxis().set_visible(False)
 	ax1.axes.get_yaxis().set_visible(False)
-	plt.colorbar()
+	cbar = plt.colorbar()
+	plt.setp(plt.getp(cbar.ax.axes, 'yticklabels'), color='white')
 
 	Z=np.asarray(je_i)
 	Z=np.where(Z > 0., Z, 0)
@@ -293,17 +297,18 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 	ax1 = plt.pcolormesh(X,Y,Z,vmin = pmin, vmax = pmax, cmap=colormap)
 	ax1.axes.get_xaxis().set_visible(False)
 	ax1.axes.get_yaxis().set_visible(False)
-	plt.colorbar()
+	cbar = plt.colorbar()
+	plt.setp(plt.getp(cbar.ax.axes, 'yticklabels'), color='white')
 
 	plt.figtext(0.50,0.97,'OVATION Aurora Model', color='yellow',size = 18,ha = 'center')
 	plt.figtext(0.50,0.94, 'L1 Observations at %s (UTC)' % mdate.strftime("%Y-%m-%d %H:%M"),color='yellow',size = 10,ha = 'center')
 	plt.figtext(0.50,0.92, 'Hemespheric Power %s' %str(HP),color='yellow',size = 10,ha = 'center')
 	plt.figtext(0.50,0.02, 'Plots are in geomagnetic coordinates',color='yellow',size = 10,ha = 'center')
 
-	plt.figtext(.48,.78,'Energy Flux (ergs/$cm^2$)',color='white', size = 10, ha='center',rotation = 270)
-	plt.figtext(.905,.78,'Energy Flux (ergs/$cm^2$)',color='white', size = 10, ha='center',rotation = 270)
-	plt.figtext(.48,.38,'Energy Flux (ergs/$cm^2$)',color='white', size = 10, ha='center',rotation = 270)
-	plt.figtext(.905,.38,'Energy Flux (ergs/$cm^2$)',color='white', size = 10, ha='center',rotation = 270)
+	plt.figtext(.48,.60,'Energy Flux (ergs/$cm^2$)',color='white', size = 10, ha='center',rotation = 270)
+	plt.figtext(.905,.60,'Energy Flux (ergs/$cm^2$)',color='white', size = 10, ha='center',rotation = 270)
+	plt.figtext(.48,.20,'Energy Flux (ergs/$cm^2$)',color='white', size = 10, ha='center',rotation = 270)
+	plt.figtext(.905,.20,'Energy Flux (ergs/$cm^2$)',color='white', size = 10, ha='center',rotation = 270)
 
 	plt.figtext(.27,.9,'Diffuse',color='yellow', size = 12, ha='center')
 	plt.figtext(.70,.9,'Monoenergetic',color='yellow', size = 12, ha='center')

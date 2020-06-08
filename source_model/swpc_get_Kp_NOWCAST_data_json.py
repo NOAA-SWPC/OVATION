@@ -13,10 +13,10 @@ import requests
 import json
 
 
-def swpc_get_Kp_forecast_data_json():
+def swpc_get_Kp_NOWCAST_data_json():
 	
 	urlpath = 'http://services.swpc.noaa.gov/products/'
-	filename = 'noaa-planetary-k-index-forecast.json'
+	filename = 'noaa-estimated-planetary-k-index-1-minute.json'
 	
 	
 	##############################################################
@@ -29,27 +29,25 @@ def swpc_get_Kp_forecast_data_json():
 	response = requests.get(url_Kp)
 	
 	data_Kp = json.loads(response.text)
-
 	
-	time_Kp = []
-	Kp = []
+	
+	numavg= 30			#Set number of 1-minute Kp values to average
 	
 	n = len(data_Kp)
+	Kp_el = np.zeros(n)
 	
-	for i in range(1,n-1): # because first line is header
-		temp = str(data_Kp[i][0])
-		time = (dt.datetime(int(temp[0:4]), int(temp[5:7]), int(temp[8:10]), int(temp[11:13]), int(temp[14:16])))
-		Kp_el = str(data_Kp[i][1])
-		Mode = str(data_Kp[i][2])
+	if n <= numavg: return(0)
 	
-		if Mode != 'observed':
-			time_Kp = np.append(time_Kp,time)
-			Kp = np.append(Kp,Kp_el)
-			
+	# for i in range(1,n-1): # because first line is header
+	temp = str(data_Kp[n-1][0])
+	f_time = (dt.datetime(int(temp[0:4]), int(temp[5:7]), int(temp[8:10]), int(temp[11:13]), int(temp[14:16])))
 	
-#	for ii in range(len(Kp)): print(ii,time_Kp[ii], Kp[ii])
+	for i1 in range (1,n-1):Kp_el[i1] = data_Kp[i1][1]
 	
+	Kp = np.mean(Kp_el[n-1-numavg:n-1])
 	
-	return(time_Kp,Kp)
+	return(f_time,Kp,f_time)
+
+
 
 
