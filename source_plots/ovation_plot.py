@@ -470,12 +470,9 @@ HPI: %5.1f GW (Range 5 to 200)'\
 		ofl = 'north/aurora_N_' + file_date + image_type
 		if NS == 1:
 			ofl_latest = 'latest_aurora_S'+image_type
-			ofl = 'south/aurora_S_' + file_date + image_type
-	
-		
+			ofl = 'south/aurora_S_' + file_date + image_type		
 	
 	#   *******************************Save Final Image to "Latest Image" File and Final file****************************************
-	
 	
 		ofile_image = Image_Output_path+ofl
 		im.save(ofile_image ,facecolor = 'black', edgecolor = 'black',bbox_inches = 'tight', pad_inches = 0) 
