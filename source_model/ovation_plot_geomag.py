@@ -39,9 +39,9 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 	#~ input_file = open(Input_path + Input_file, 'r')
 
 	if ifile.find('aurora_N') != -1:
-		input_file = open(ipath+ 'North/'+ ifile+'.txt','r')
+		input_file = open(ipath+ 'north/'+ ifile+'.txt','r')
 	else:
-		input_file = open(ipath+ 'South/'+ ifile+'.txt','r')
+		input_file = open(ipath+ 'south/'+ ifile+'.txt','r')
 
 	fhead = input_file.readline()
 

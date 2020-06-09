@@ -1,13 +1,25 @@
 version: '2.1'
 services:
   ovation:
-    image: rhel7-workstation-lx.swpc.noaa.gov/ovation:latest
+    image: rhel7-workstation-lx.swpc.noaa.gov/ovation/ovation-2020:1.0
     build: .
     tty: true
     volumes:
-      #host:container - this will need ownership by the ovation user on the host
-      - ./Output:/Output
+      - ovation:/Output:z
     env_file:
       - ovation.env
     command: [ "/bin/bash", "driver.sh" ]
     restart: unless-stopped
+
+  web-server:
+    #build: nginx
+    image: rhel7-workstation-lx.swpc.noaa.gov/sundial/solar-wind-microservice_nginx:1.0
+    ports:
+      - "8092:80"
+    tty: true
+    volumes:
+      - "ovation:/www:ro"
+    restart: always
+
+volumes:
+  ovation:
