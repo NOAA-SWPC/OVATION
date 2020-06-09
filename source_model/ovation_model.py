@@ -52,7 +52,7 @@ from write_HP_file_model import write_HP_file
 #	Reads these data from the SWPC online database
 
 
-mode = os.environ.get('mode', 'HISTORIC')
+mode = os.environ.get('mode', 'NOWCAST')
 
 print("mode is: {}".format(mode))
 
@@ -82,10 +82,10 @@ cadence = os.environ.get('cadence', 30)   #Cadence in Minutes
 #Set Run Option Flags
 
 Omni = os.environ.get('Omni', False)  #If, True, then use OMNI data... otherwise use a flat file
-NorthSouth = os.environ.get('NorthSouth', False)  #If True then plot both hemisphereal
+NorthSouth = os.environ.get('NorthSouth', True)  #If True then plot both hemisphereal
 image_output = os.environ.get('image_output', False)  #If True, then output geomag coordinate quadplot images
 HPI_output = os.environ.get('HPI_output', True)  # If True then output Hemispheric Power Index to a file
-aurora_output = os.environ.get('aurora_output', False)  # If True, the output the aurora ASCII file
+aurora_output = os.environ.get('aurora_output', True)  # If True, the output the aurora ASCII file
 
 if mode == 'FORECAST': HPI_output = False
 num_forecast_days = os.environ.get('num_forecast_days', 1)  #Set the number of days to forecast (must be less than 3)

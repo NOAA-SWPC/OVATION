@@ -325,7 +325,7 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 #   *       If themost recent hour of solar wind data  are not avaialbe, set the whole array to zeros    
 #   ***********************************************************************************************	
 	
-	Bmag_avg[0] = float("nan")   #Uncomment this line to test the Kp backup option
+# 	Bmag_avg[0] = float("nan")   #Uncomment this line to test the Kp backup option
 					 
 	for i in range(n_hours):
 		if np.isnan(Bmag_avg[i]):
