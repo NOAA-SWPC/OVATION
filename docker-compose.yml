@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   ovation:
-    image: rhel7-workstation-lx.swpc.noaa.gov/ovation/ovation-2020:1.0
+    image: rhel7-workstation-lx.swpc.noaa.gov/ovation/ovation-2020:1.1
     build: .
     tty: true
     volumes:
