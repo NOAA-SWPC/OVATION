@@ -353,7 +353,7 @@ HPI: %5.1f GW (Range 5 to 200)'\
 	lr_text = 'OVATION Aurora Model\nModel Run at %s (UTC)\nL1 Observations at %s (UTC)'\
 		  %(now.strftime("%Y-%m-%d %H:%M"), mdate.strftime("%Y-%m-%d %H:%M"))
 
-	plt.figtext(0.99,0.01, lr_text,color = text_color, backgroundcolor = background_color,size = font_14,ha = 'right')
+	plt.figtext(0.99,0.02, lr_text,color = text_color, backgroundcolor = background_color,size = font_14,ha = 'right')
 
 #   **************************  Warning Text When Program Relies on Kp instead of L1  ************************
 
@@ -366,32 +366,35 @@ HPI: %5.1f GW (Range 5 to 200)'\
 	
 
 	#  **********************   Add and Lable Colorbar.  ***********************
-
-	cax = plt.axes([0.05,0.08,0.30,0.027])
-	cb=plt.colorbar(im1,cax=cax,orientation = "horizontal", ticks= [1,2,3,4,5])
+	plt.figtext(0.157,.0,'   Probability of Aurora   \n\n\n\n\n\n\n', color = 'yellow',backgroundcolor = background_color, size =font_16, ha = "center",weight = 'bold',zorder = 2)
+	plt.figtext(0.157,.124,'10%            50%            90%', color = 'yellow', size =font_14,ha = "center") 
+	
+	cax = plt.axes([0.01,0.08,0.30,0.028])
+	cb=plt.colorbar(im1,cax=cax,orientation = "horizontal", ticks= [0,1,2,3,4])
+	cb.ax.zorder = 10
 
 	cb.patch.set_facecolor('darkgray')
-	cb.set_label('Approximate Energy Deposition', color=fg_color)
+	cb.set_label('Approximate Energy Deposition\nergs/cm2', color=fg_color, size =font_14,zorder = 10)
 
-	cb.ax.set_xticklabels(['1','2','3','4','5'],color=fg_color)
+	cb.ax.set_xticklabels([' 0 ',' 1 ',' 2 ',' 3 ','       4    >4'],color=fg_color, size =font_14,zorder = 10)
 	cb.outline.set_edgecolor(fg_color) 	
 
-	plt.figtext(0.2,.12,'   Probability of Aurora   \n', color = 'yellow',backgroundcolor = background_color, size =font_16, ha = "center",weight = 'bold')
-	plt.figtext(0.05,.12,'10%            50%            90%', color = 'yellow', size =font_14) 
-	cb_text = '       1        2        3        4        >4       \n(erg/cm2)\nApproximate Energy Deposition'
-	plt.figtext(0.2,.02, cb_text, color=fg_color,ha = "center",size =font_12,backgroundcolor = background_color)
 
+ 	# cb_text = '       1        2        3        4        >4       \n(erg/cm2)\nApproximate Energy Deposition'
+# 	plt.figtext(0.2,.02, cb_text, color=fg_color,ha = "center",size =font_12,backgroundcolor = background_color)
 
-#  ************************   Getting rid of extra black boarder   **********************
-# 	Without these lines, the output image has excessive black space around it
+#
+# ***********************   Add NOAA Logo  to image  **************************		
 
-	plt.gca().set_axis_off()
-	plt.subplots_adjust(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
-	plt.margins(0,0)
-	plt.gca().xaxis.set_major_locator(plt.NullLocator())
-	plt.gca().yaxis.set_major_locator(plt.NullLocator())
+	icon = Image.open(Logo_path + "NOAA_logo4.png")
+	
+	height = icon.size[1]
+	icon = np.array(icon).astype(np.float) / 255
 
-
+	newax = fig.add_axes([0., .9, 0.1, 0.1], anchor='NE', zorder=-1)
+	newax.imshow(icon)
+	newax.axis('off')
+	
 #  *************************   Save Graphics to File *****************************
 
 
@@ -407,18 +410,6 @@ HPI: %5.1f GW (Range 5 to 200)'\
 	file_date = syear + '-' + smonth + '-' + sday + '_' + shour + sminute
 	
 
-#
-# ***********************   Add NOAA Logo  to image  **************************		
-
-	icon = Image.open(Logo_path + "NOAA_logo4.png")
-	
-	height = icon.size[1]
-	icon = np.array(icon).astype(np.float) / 255
-
-	newax = fig.add_axes([0., .9, 0.1, 0.1], anchor='NE', zorder=-1)
-	newax.imshow(icon)
-	newax.axis('off')
-
 #  ******************   Save North and South Image Files   *******************************	
 # 	plt.convert('RGB')
 	
@@ -430,7 +421,6 @@ HPI: %5.1f GW (Range 5 to 200)'\
 		ofl_latest = 'latest_aurora_S'+image_type
 		ofl = 'south/aurora_S_' + file_date + image_type
 
-	
 
 #   *******************************Save Final Image to "Latest Image" File and Final file****************************************
 
