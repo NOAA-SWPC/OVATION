@@ -22,7 +22,7 @@ RUN conda install -y -c anaconda basemap \
 
 ENV PROJ_LIB=/usr/share/proj
 
-RUN /opt/conda/bin/pip --disable-pip-version-check --no-cache-dir install requests matplotlib numpy scipy aacgmv2 image
+RUN /opt/conda/bin/pip --disable-pip-version-check --no-cache-dir install requests matplotlib numpy scipy aacgmv2 image geojson
 
 # make necessary directories
 RUN mkdir Output
@@ -31,10 +31,8 @@ RUN chown ovation:ovation Output
 USER $USERNAME
 
 # Add the source code into the image
-COPY --chown=ovation:ovation source source
+COPY --chown=ovation:ovation source_model source_model
 COPY --chown=ovation:ovation source_plots source_plots
 COPY --chown=ovation:ovation driver.sh .
 
 COPY --chown=ovation:ovation SW_Data SW_Data
-COPY --chown=ovation:ovation configuration configuration
-COPY --chown=ovation:ovation logo logo
