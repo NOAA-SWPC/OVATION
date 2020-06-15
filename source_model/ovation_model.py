@@ -35,7 +35,6 @@ from write_ascii_file import write_ascii_file
 from get_solar_wind_historic_data_new import get_solar_wind_historic_data
 from get_solar_wind_omni import get_solar_wind_omni
 from rem_out import rem_out
-from ovation_plot_geomag import ovation_plot_geomag
 from write_HP_file_model import write_HP_file
 
 #***************************   Set Run Mode  *******************************
@@ -83,7 +82,7 @@ cadence = os.environ.get('cadence', 30)   #Cadence in Minutes
 
 Omni = os.environ.get('Omni', False)  #If, True, then use OMNI data... otherwise use a flat file
 NorthSouth = os.environ.get('NorthSouth', True)  #If True then plot both hemisphereal
-image_output = os.environ.get('image_output', False)  #If True, then output geomag coordinate quadplot images
+image_output = os.environ.get('image_output', True)  #If True, then output geomag coordinate quadplot images
 HPI_output = os.environ.get('HPI_output', True)  # If True then output Hemispheric Power Index to a file
 aurora_output = os.environ.get('aurora_output', True)  # If True, the output the aurora ASCII file
 
@@ -92,7 +91,6 @@ num_forecast_days = os.environ.get('num_forecast_days', 1)  #Set the number of d
 
 Output_Path_text = Output_path + mode + '/model_output/'
 HP_Output_path = Output_path + mode + '/ovation_products/hpi_text/'
-Output_path_images = Output_Path_text + '/graphic/'
 
 # Create directories if missing
 
@@ -343,17 +341,6 @@ for iloop in range(nloops):
 		print ("Forecast Time", time_for)
 		print ('NS = ',NS)
 
-		if aurora_output: wf = write_ascii_file(mode,NS,Output_Path_text,time_sw, time_for, time_lab, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1)
+		if aurora_output: opath,ofile = write_ascii_file(mode,NS,Output_Path_text,time_sw, time_for, time_lab, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1)
 
 
-
-#  ***************************  Create Image Files If Flag is Set  ***********************
-# 		                           Not Requred for Operations
-		
-		
-# 		print("image_output: {}, Output_Path_text: {}, 2nd arg: {}".format(image_output, Output_Path_text, Output_path_images+wf+'.png'))
-		if image_output:
-			print("image_output: {}, Output_Path_text: {}, 2nd arg: {}".format(image_output, Output_Path_text, Output_path_images+wf+'.png'))
-			os.makedirs(Output_path_images, exist_ok=True)
-			print("making directory path (if necessary) {}".format(Output_path_images))
-			ovation_plot_geomag(Output_Path_text,wf, Output_path_images+wf+'.png')

@@ -29,7 +29,7 @@ def polar2cart(r, theta):
     return x, y
 
 
-def ovation_plot_geomag (ipath,ifile,ofile):
+def ovation_plot_geomag (ipath,ifile,opath,ofile):
 
 # ******************	Open and read the file created by the Ovation Model**************
 
@@ -38,10 +38,14 @@ def ovation_plot_geomag (ipath,ifile,ofile):
 
 	#~ input_file = open(Input_path + Input_file, 'r')
 
-	if ifile.find('aurora_N') != -1:
-		input_file = open(ipath+ 'North/'+ ifile+'.txt','r')
-	else:
-		input_file = open(ipath+ 'South/'+ ifile+'.txt','r')
+# 	if ifile.find('aurora_N') != -1:
+# 		input_file = open(ipath+ 'north/'+ ifile+'.txt','r')
+# 	else:
+# 		input_file = open(ipath+ 'south/'+ ifile+'.txt','r')
+
+	ipf = ipath + ifile + '.txt.'
+	print (ipf)
+	input_file = open (ipf, 'r')
 
 	fhead = input_file.readline()
 

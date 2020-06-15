@@ -67,4 +67,4 @@ def write_ascii_file(mode,NS,Output_Path,time_sw,time_for,time_lab,mlt_array,mla
 	#~ else:
 		#~ np.savetxt(Output_Path + 'aurora_S_'+str(time_sw)[0:10] + '_' + str(time_sw)[11:13] + str(time_sw)[14:16]+'.txt', zipped, fmt = '%10.4f', header = header_all)
 	
-	return(ofile_name)
+	return(Output_Path + ipath, ofile_name)
