@@ -49,8 +49,8 @@ from kp_and_g_scale import kp_and_g_scale
 
 
 Home_path = os.environ.get('Home_path','./')
-Input_path = os.environ.get('Input_path','../output')
-Output_path = os.environ.get('Output_path','../output/NOWCAST/ovation_products/')
+Input_path = os.environ.get('Input_path','../Output')
+Output_path = os.environ.get('Output_path','../Output/NOWCAST/ovation_products/')
 Logo_path = os.environ.get('Logo_path','../source_plots/')
 
 Image_Output_path = Output_path + 'images/'
