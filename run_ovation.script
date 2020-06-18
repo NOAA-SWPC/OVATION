@@ -1,6 +1,0 @@
-#Run the Ovation model
-#redirect output to a log file
-
-python3 /home/rodney.viereck/python/ovation_2020/source_model/ovation_model.py >> /home/rodney.viereck/run_ovation.log
-
-
