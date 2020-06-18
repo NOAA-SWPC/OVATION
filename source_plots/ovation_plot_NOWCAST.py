@@ -47,6 +47,7 @@ from kp_and_g_scale import kp_and_g_scale
 
 #  ***************** Set Run Parameters  *************************
 
+print('Current Working Directory  ', os.getcwd())
 
 Home_path = os.environ.get('Home_path','./')
 Input_path = os.environ.get('Input_path','../output')
@@ -78,6 +79,9 @@ run_once = True
 plot_south = True
 create_json = True
 Input_path = Input_path + '/NOWCAST/model_output/'
+
+time_now = dt.datetime.utcnow() # Set Current Time
+print('Current Time:  ',time_now)
 
 ins = 1
 if plot_south == True:

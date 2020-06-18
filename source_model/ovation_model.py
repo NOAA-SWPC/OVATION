@@ -338,3 +338,6 @@ for iloop in range(nloops):
 		print ("Forecast Time", time_for)
 		print ('NS = ',NS)
 
+		if aurora_output: opath,ofile = write_ascii_file(mode,NS,Output_Path_text,time_sw, time_for, time_lab, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1,sw_avg)
+
+
