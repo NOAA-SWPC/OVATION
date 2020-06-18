@@ -82,7 +82,6 @@ cadence = os.environ.get('cadence', 30)   #Cadence in Minutes
 
 Omni = os.environ.get('Omni', False)  #If, True, then use OMNI data... otherwise use a flat file
 NorthSouth = os.environ.get('NorthSouth', True)  #If True then plot both hemisphereal
-image_output = os.environ.get('image_output', True)  #If True, then output geomag coordinate quadplot images
 HPI_output = os.environ.get('HPI_output', True)  # If True then output Hemispheric Power Index to a file
 aurora_output = os.environ.get('aurora_output', True)  # If True, the output the aurora ASCII file
 
@@ -98,9 +97,7 @@ os.makedirs(Output_Path_text + 'north/', exist_ok=True)
 print("making directory path (if necessary) {}".format(Output_Path_text +'north/'))
 os.makedirs(Output_Path_text + 'south/', exist_ok=True)
 print("making directory path (if necessary) {}".format(Output_Path_text +'south/'))
-if image_output:
-	os.makedirs(Output_Path_text + 'graphic/', exist_ok=True)
-	print("making directory path (if necessary) {}".format(Output_Path_text +'graphic/'))
+
 if HPI_output:
  	os.makedirs(Output_path + mode + '/ovation_products/hpi_text/', exist_ok=True)
  	print("making directory path (if necessary) {}".format(Output_path + mode + '/ovation_products/hpi_text/'))
@@ -340,7 +337,4 @@ for iloop in range(nloops):
 # 		print (lbl_1 ,time_sw)
 		print ("Forecast Time", time_for)
 		print ('NS = ',NS)
-
-		if aurora_output: opath,ofile = write_ascii_file(mode,NS,Output_Path_text,time_sw, time_for, time_lab, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1)
-
 

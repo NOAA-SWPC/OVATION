@@ -307,11 +307,16 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 	density_avg = []
 	sec_avg = []
 	
-
-	
+				 
 	for i in range(n_hours):
+		
 		idx_hour = np.where( np.logical_and( seconds_to_impact >= (seconds_epoch-(i+1)*3600), seconds_to_impact<(seconds_epoch-i*3600) ) )
-		if int(int(idx_hour[-1][-1])) >= len(Bx): del(idx_hour[-1][-1])  #Occasionally there will be too many elements in the array
+		
+
+		if (len(Bx) <= idx_hour[0][-1]): 
+ 			print('Warning: Bx Array Overrun Problem:  ',len(Bx), idx_hour[0][-1])
+ 			idx_hour[0][:] = idx_hour[0][:] - 1
+		
 		Bx_average.append( np.nanmean(Bx[idx_hour]) ) # excluding nans
 		By_average.append( np.nanmean(By[idx_hour]) )
 		Bz_average.append( np.nanmean(Bz[idx_hour]) )
