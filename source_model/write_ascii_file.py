@@ -8,7 +8,7 @@ import datetime as dt
 #from ovation_plot_geomag_new import ovation_plot_geomag
 #from ovation_plot_new import ovation_plot
 
-def write_ascii_file(mode,NS,Output_Path,time_sw,time_for,time_lab,mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_2):
+def write_ascii_file(mode,NS,Output_Path,time_sw,time_for,time_lab,mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_2,sw_avg):
 
 	lable1 = 'Observation Time: '
 	if mode == 'FORECAST': lable1 = 'Forecast Issued: '
@@ -58,7 +58,27 @@ def write_ascii_file(mode,NS,Output_Path,time_sw,time_for,time_lab,mlt_array,mla
 		ofile2.write(header_all)
 	
 		for iloop in range(nrows): ofile2.write(' %8.4e   %8.4e  %8.4e  %8.4e  %8.4e  %8.4e \n' %(mlt_array[iloop], mlat_array[iloop], je_d[iloop],je_m[iloop],je_w[iloop],je_i[iloop]))
-		
+	
+		ofile2.write('Model Input Parameters:')
+		t1 = np.array(sw_avg['Bx'])
+		ofile2.write('\nBx:    ')
+		ofile2.write('%8.2e, '*4 %(t1[0], t1[1], t1[2],t1[3]))
+		t1 = np.array(sw_avg['By'])
+		ofile2.write('\nBy:    ')
+		ofile2.write('%8.2e, '*4 %(t1[0], t1[1], t1[2],t1[3]))
+		t1 = np.array(sw_avg['Bz'])
+		ofile2.write('\nBz:    ')
+		ofile2.write('%8.2e, '*4 %(t1[0], t1[1], t1[2],t1[3]))
+		t1 = np.array(sw_avg['B_average'])
+		ofile2.write('\nBtot: ')
+		ofile2.write('%8.2e, '*4 %(t1[0], t1[1], t1[2],t1[3]))
+		t1 = np.array(sw_avg['v'])
+		ofile2.write('\nV:     ')
+		ofile2.write('%8.2e, '*4 %(t1[0], t1[1], t1[2],t1[3]))
+		t1 = np.array(sw_avg['ni'])
+		ofile2.write('\nDen:   ')
+		ofile2.write('%8.2e, '*4 %(t1[0], t1[1], t1[2],t1[3]))
+# 	
 		ofile2.close()
 	
 #	ovation_plot_geomag(Output_Path,ofile_name)
