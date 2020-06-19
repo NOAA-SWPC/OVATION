@@ -47,7 +47,6 @@ from kp_and_g_scale import kp_and_g_scale
 
 #  ***************** Set Run Parameters  *************************
 
-print('Current Working Directory  ', os.getcwd())
 
 Home_path = os.environ.get('Home_path','./')
 Input_path = os.environ.get('Input_path','../output')
@@ -439,12 +438,14 @@ HPI: %5.1f GW (Range 5 to 200)'\
 
 	plt.close()	
 # 	im.close()
-#   **************************   Call output_geojson subroutine    *************************
-		
-	if create_json: 
-		global_array = global_array * 100./upper_limit    #Scale data to go from 0 to 100
-		np.clip(global_array, 0.,100.,out=global_array)  #clip the data at 100
-					
-		write_geojson(Gridded_Output_path, mdate, fdate,file_date, global_array)	
 
 	input_file.close()
+	
+#   **************************   Call output_geojson subroutine    *************************
+	
+if create_json: 
+	global_array = global_array * 100./upper_limit    #Scale data to go from 0 to 100
+	np.clip(global_array, 0.,100.,out=global_array)  #clip the data at 100
+				
+	write_geojson(Gridded_Output_path, mdate, fdate,file_date, global_array)	
+

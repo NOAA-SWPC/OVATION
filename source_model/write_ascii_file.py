@@ -51,6 +51,26 @@ def write_ascii_file(mode,NS,Output_Path,time_sw,time_for,time_lab,mlt_array,mla
 
 	for iloop in range(nrows): ofile.write(' %8.4e   %8.4e  %8.4e  %8.4e  %8.4e  %8.4e \n' %(mlt_array[iloop], mlat_array[iloop], je_d[iloop],je_m[iloop],je_w[iloop],je_i[iloop]))
 	
+	ofile.write('Model Input Parameters:')
+	t1 = np.array(sw_avg['Bx'])
+	ofile.write('\nBx:    ')
+	ofile.write('%8.2e, '*4 %(t1[0], t1[1], t1[2],t1[3]))
+	t1 = np.array(sw_avg['By'])
+	ofile.write('\nBy:    ')
+	ofile.write('%8.2e, '*4 %(t1[0], t1[1], t1[2],t1[3]))
+	t1 = np.array(sw_avg['Bz'])
+	ofile.write('\nBz:    ')
+	ofile.write('%8.2e, '*4 %(t1[0], t1[1], t1[2],t1[3]))
+	t1 = np.array(sw_avg['B_average'])
+	ofile.write('\nBtot: ')
+	ofile.write('%8.2e, '*4 %(t1[0], t1[1], t1[2],t1[3]))
+	t1 = np.array(sw_avg['v'])
+	ofile.write('\nV:     ')
+	ofile.write('%8.2e, '*4 %(t1[0], t1[1], t1[2],t1[3]))
+	t1 = np.array(sw_avg['ni'])
+	ofile.write('\nDen:   ')
+	ofile.write('%8.2e, '*4 %(t1[0], t1[1], t1[2],t1[3]))
+# 	
 	ofile.close()
 	
 	if mode == 'NOWCAST':

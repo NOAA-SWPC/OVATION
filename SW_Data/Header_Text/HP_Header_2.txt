@@ -7,6 +7,6 @@
 #
 # Tabular Data Format
 #
-# Year-Month-Day Hour:Minute    North-Hemispheric-Power-Index-GigaWatts    South-Hemispheric-Power-Index-GigaWatts
-# YYYY-MM-DD HH:MM     NorthHPI(GW)    SouthHPI(GW)
-#----------------------------------------------------
+# Observation        Forecast            North-Hemispheric-Power-Index    South-Hemispheric-Power-Index-GigaWatts
+# YYYY-MM-DD_HH:MM   YYYY-MM-DD_HH:MM    GigaWatts    			  GigaWatts
+#------------------------------------------------------------------------------------------------

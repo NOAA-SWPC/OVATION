@@ -26,7 +26,8 @@ import geojson
 def write_geojson( Gridded_Output_path, mdate, fdate, file_date, global_array):
 	
 
-	ofile_json = Gridded_Output_path+'Aurora_'+file_date+'.gjson'
+	ofile_json = 'Aurora_'+file_date+'.gjson'
+	ofile_zip = 'Aurora_'+file_date+'.zip'
 	ofile_latest = Gridded_Output_path+'Aurora_latest.gjson'
 	
 	cols = ['lon','lat','aur']
@@ -63,7 +64,7 @@ def write_geojson( Gridded_Output_path, mdate, fdate, file_date, global_array):
 	obs_time = mdate.strftime('%Y-%m-%dT%H:%M:%SZ')
 	for_time = fdate.strftime('%Y-%m-%dT%H:%M:%SZ')
 	
-	with open(ofile_json, 'w+') as fp:
+	with open(Gridded_Output_path + ofile_json, 'w+') as fp:
 
 		fp.write('{\"Observation Time\": \"' + obs_time + '\", \"Forecast Time\": \"'+ for_time +'\", \"Data Format\": \"[Longitude, Latitude, Aurora]\", ')
 		geojson.dump(geojson.MultiPoint(points), fp, sort_keys=True)
@@ -75,6 +76,12 @@ def write_geojson( Gridded_Output_path, mdate, fdate, file_date, global_array):
 	
 	fp.close()
 	
-	shutil.copyfile(ofile_json, ofile_latest)
+	shutil.copyfile(Gridded_Output_path + ofile_json, ofile_latest)
+	
+# 	Zip compress json file for archive
+
+	cmd0 = 'cd '+ Gridded_Output_path + ' &&  zip ' + ofile_zip + ' ' + ofile_json + ' && rm ' + ofile_json
+	os.system(cmd0)
+
 	
 	return()

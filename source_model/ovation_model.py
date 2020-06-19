@@ -302,9 +302,8 @@ for iloop in range(nloops):
 		else:
 			print ('South hemispheric power:  %6.1f ' %power_hemi)
 			
-		if HPI_output: write_HP_file(power_hemi, HP_Output_path, header_path, sw_avg['time_latest_solar_wind'], NS, NorthSouth, mode)
 
-	#  ******************  Write Data to File  *****************************
+	#  ******************  Write Data to Files  *****************************
 
 		if mode != 'FORECAST':
 
@@ -328,8 +327,10 @@ for iloop in range(nloops):
 		else:
 			time_for = time_Kp[iloop]
 			time_lab = time_for
+			
+		if mode == 'NOWCAST': time_lab = time_now
 
-
+		if HPI_output: write_HP_file(power_hemi, HP_Output_path, header_path,time_lab,time_for, NS, NorthSouth, mode)
 
 		lbl_1 = "Time of Last Solar Wind "
 		if mode == 'FORECAST': lbl_1 = "Time Kp Forecast was Issued "
@@ -338,6 +339,7 @@ for iloop in range(nloops):
 		print ("Forecast Time", time_for)
 		print ('NS = ',NS)
 
-		if aurora_output: opath,ofile = write_ascii_file(mode,NS,Output_Path_text,time_sw, time_for, time_lab, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1,sw_avg)
+		if aurora_output: 
+			opath,ofile = write_ascii_file(mode,NS,Output_Path_text,time_sw, time_for, time_lab, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1,sw_avg)
 
 
