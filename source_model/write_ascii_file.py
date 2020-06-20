@@ -8,13 +8,14 @@ import datetime as dt
 #from ovation_plot_geomag_new import ovation_plot_geomag
 #from ovation_plot_new import ovation_plot
 
-def write_ascii_file(mode,NS,Output_Path,time_sw,time_for,time_lab,mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_2,sw_avg):
+def write_ascii_file(mode,NS,Output_Path,time_sw,time_for,time_now,mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_2,sw_avg):
 
+	lable0 = 'Model_Run Time: '
 	lable1 = 'Observation Time: '
 	if mode == 'FORECAST': lable1 = 'Forecast Issued: '
 	
 	header0 = 'OVATION Prime (2013 Version) \n'
-	header1 = lable1 + str(time_sw) + '\nForecast Time:    '+  str(time_for) + '\n'
+	header1 = lable0 + str(time_now) + '\n' + lable1 + str(time_sw) + '\nForecast Time:    '+  str(time_for) + '\n'
 	header2 = 'Hemispheric Power:   ' + str('%6.1f' %power_hemi) + '\nForecast Kp:   ' + str(Kp_2)
 	header3 = '\n Local_time   Lat_mag       je_diff     je_mono     je_wav      je_ions \n'
 	
@@ -32,6 +33,9 @@ def write_ascii_file(mode,NS,Output_Path,time_sw,time_for,time_lab,mlt_array,mla
 	if NS == 0: 
 		if1 = 'aurora_N_'
 		ipath = 'north/'
+	
+	time_lab = time_sw
+	if mode == 'NOWCAST':time_lab = time_now
 	
 	ofile_name = if1 + str(time_lab)[0:10] + '_' + str(time_lab)[11:13] + str(time_lab)[14:16]
 	ofile_name_2 = "Ovation_Latest_"

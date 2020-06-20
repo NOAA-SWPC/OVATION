@@ -94,13 +94,13 @@ HP_Output_path = Output_path + mode + '/ovation_products/hpi_text/'
 # Create directories if missing
 
 os.makedirs(Output_Path_text + 'north/', exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_Path_text +'north/'))
+# print("making directory path (if necessary) {}".format(Output_Path_text +'north/'))
 os.makedirs(Output_Path_text + 'south/', exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_Path_text +'south/'))
+# print("making directory path (if necessary) {}".format(Output_Path_text +'south/'))
 
 if HPI_output:
  	os.makedirs(Output_path + mode + '/ovation_products/hpi_text/', exist_ok=True)
- 	print("making directory path (if necessary) {}".format(Output_path + mode + '/ovation_products/hpi_text/'))
+ 	# print("making directory path (if necessary) {}".format(Output_path + mode + '/ovation_products/hpi_text/'))
 
 
 #Clean out FORECAST data from previous forecast
@@ -140,6 +140,7 @@ if NorthSouth == True:
 	NS_loop = 2  #if NS = 1 then just do norther hemisphere.   Make NS = 2 for both hemispheres
 
 time_now = datetime.datetime.utcnow() # Set Current Time
+time_now = time_now.replace(second=0, microsecond=0)
 
 Kp_1 = 0
 
@@ -340,6 +341,6 @@ for iloop in range(nloops):
 		print ('NS = ',NS)
 
 		if aurora_output: 
-			opath,ofile = write_ascii_file(mode,NS,Output_Path_text,time_sw, time_for, time_lab, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1,sw_avg)
+			opath,ofile = write_ascii_file(mode,NS,Output_Path_text,time_sw, time_for, time_now, mlt_array,mlat_array,je_d,je_m,je_w,je_i,power_hemi,Kp_1,sw_avg)
 
 

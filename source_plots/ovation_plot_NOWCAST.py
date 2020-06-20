@@ -58,13 +58,13 @@ Gridded_Output_path = Output_path  + 'gridded_text/'
 # HP_Output_path = Output_path + 'Text/Hemispheric_power/'
 
 os.makedirs(Output_path + 'images/', exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_path +'images/'))
+# print("making directory path (if necessary) {}".format(Output_path +'images/'))
 os.makedirs(Output_path + 'images/north/', exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_path +'images/north/'))
+# print("making directory path (if necessary) {}".format(Output_path +'images/north/'))
 os.makedirs(Output_path + 'images/south/', exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_path +'images/soutth/'))
+# print("making directory path (if necessary) {}".format(Output_path +'images/soutth/'))
 os.makedirs(Output_path + 'gridded_text/', exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_path +'gridded_text/'))
+# print("making directory path (if necessary) {}".format(Output_path +'gridded_text/'))
 
 run_realtime = os.environ.get('run_realtime',True)   #If = True, then run once and use the standard "latest" file from the ovation model
 run_once = os.environ.get('run_once',False)  #If = True, then only plot one map or one pair of maps if plot_south = 1
@@ -135,9 +135,24 @@ for NS in range(ins):
 	
 #  Read Input File and Parse Critical Variables
 	
-# 	Parse Measurement Time
+# 	Parse run Time
 
 	fhead = input_file.readline()
+	
+	rdatei = input_file.readline() .strip()
+	rdatei =rdatei.split()
+	rdate1 = rdatei[2].split("-")
+	rdate2 = rdatei[3].split(":")
+	
+	ryear = int(rdate1[0])
+	rmonth = (int(rdate1[1]))
+	rday = int(rdate1[2])
+	rhour = int(rdate2[0])
+	rminute = int(rdate2[1])
+
+	rdate = dt.datetime(ryear, rmonth, rday, rhour, rminute)
+
+#   Parse Measurement Time	
 	
 	mdatei = input_file.readline() .strip()
 	mdatei =mdatei.split()
@@ -404,11 +419,11 @@ HPI: %5.1f GW (Range 5 to 200)'\
 #    ****   Create date-time string for file names    ****
 # 	Note that the filenames will have the current run date-time not the actual foreast time
 
-	syear = str("%4.4i"%myear)
-	smonth = str("%2.2i"%mmonth)
-	sday = str("%2.2i"%mday)
-	shour = str("%2.2i"%mhour)
-	sminute = str("%2.2i"%mminute)
+	syear = str("%4.4i"%ryear)
+	smonth = str("%2.2i"%rmonth)
+	sday = str("%2.2i"%rday)
+	shour = str("%2.2i"%rhour)
+	sminute = str("%2.2i"%rminute)
 
 	file_date = syear + '-' + smonth + '-' + sday + '_' + shour + sminute
 	
