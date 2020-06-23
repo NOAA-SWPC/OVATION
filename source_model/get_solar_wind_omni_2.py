@@ -1,3 +1,23 @@
+#   This program reads an AACII flat file created by the NASA OMNI High Resolution data web page at...  
+
+# Obtain the historic solar wind data:  
+# 	The easiest way to do this is at the NASA OMNI web site.  
+# 	You can select the data you need depending on the cadence of your required output.   
+# https://omniweb.gsfc.nasa.gov/form/omni_min.html for the  1 or 5 minute high resolution data
+
+# Once you are on this web site select your preferred parameters…
+# Output as a file 
+# Resolution (e.g. 5 minute)
+# Start and Stop datetimes
+# Select the following variables
+# 	IMF Magnitude 
+# 	Bx GSE/GSM
+# 	By GSE
+# 	Bz GSE
+# 	Flow Speed
+# 	Proton Density
+# You should choose a start date that is half a day prior to the time you want to start because the model 
+# requires the last 4 hours of data.  Then submit your request and you should get a link to a page with all your data.
 
 #import configparser
 #~ import pyodbc 
@@ -29,22 +49,10 @@ def get_solar_wind_omni(input_file, start_date,first_read, last_date, Bx, By,Bz,
 		ldate = ldate + dt.timedelta(days = doy-1)
 		da = ldate + dt.timedelta(hours = hour) + dt.timedelta(minutes = minute)
 	
-		
-		#~ print (year, doy, hour, minute)
-		#~ print (ldatetime)
-		#~ quit()
 
-		#~ fdatei = input_file.readline() .strip().split()
-		#~ read_date =  fdatei[0]+ ' ' + fdatei[1]
-		#~ da = datetime.strptime(read_date, '%Y-%m-%d %H:%M:%S')
 
 		while da < initial_date:  		# Skip Forward until starting time is found
-			#~ fdatei = input_file.readline() .strip().split()
-			#~ read_date =  fdatei[0]+ ' ' + fdatei[1]
-			#~ da =datetime.strptime(read_date, '%Y-%m-%d %H:%M:%S')
 
-			#~ test = []
-			#~ test_date = []
 			
 			row = input_file.readline().split()
 			
@@ -71,40 +79,20 @@ def get_solar_wind_omni(input_file, start_date,first_read, last_date, Bx, By,Bz,
 			ldate = dt.datetime(year, 1, 1, 0, 0)
 			ldate = ldate + dt.timedelta(days = doy-1)
 			da = ldate + dt.timedelta(hours = hour) + dt.timedelta(minutes = minute)
-			
-			#~ print (row[0:12])
-			#~ print (row[13:24])
-			#~ print (row[25:36])
-			#~ quit()
-			
-			#~ time_a.append(da)
-			print('row   ',row)
-			if float(row[21]) < 10000.:
-				Bx.append(float(row[14]))
-				By.append(float(row[15]))
-				Bz.append(float(row[16]))
-				Btot.append(float(row[13]))
-				speed.append(float(row[21]))
-				density.append(float(row[25]))
 
 
-		#~ Bx = np.asarray(Bx)
-		#~ By = np.asarray(By)
-		#~ Bz = np.asarray(Bz)
-		#~ Btot = np.asarray(Btot)
-		#~ density = np.asarray(density)
-		#~ speed = np.asarray(speed)
-
-		#~ current_end_date = start_date +  dt.timedelta(minutes = cadence)
-
-		#~ test_date.append(current_end_date)
-		#~ test.append(float(fdatei[2]))
+			if float(row[8]) < 10000.:
+				Bx.append(float(row[5]))
+				By.append(float(row[6]))
+				Bz.append(float(row[7]))
+				Btot.append(float(row[4]))
+				speed.append(float(row[8]))
+				density.append(float(row[9]))
 
 
 		if len(Bx) == 0 or len(density) == 0 or len(speed) == 0:
 			print('No realtime solar wind data available... Aborting...')
-			#~ return
-			# maybe use Kp index here...
+			return()
 
 	else:
 
@@ -123,26 +111,17 @@ def get_solar_wind_omni(input_file, start_date,first_read, last_date, Bx, By,Bz,
 			ldate = ldate + dt.timedelta(days = doy-1)
 			da = ldate + dt.timedelta(hours = hour) + dt.timedelta(minutes = minute)
 			
-			#~ print (row[0:12])
-			#~ print (row[13:24])
-			#~ print (row[25:36])
-			#~ quit()
-			
-			#~ time_a.append(da)
-#			print (type(Bx))
-#			quit()
-				
-			if float(row[21]) < 10000.:
-				Bx.append(float(row[14]))
-				By.append(float(row[15]))
-				Bz.append(float(row[16]))
-				Btot.append(float(row[13]))
-				speed.append(float(row[21]))
-				density.append(float(row[25]))
 
-			
-			#~ test_date.append(db)
-			#~ test.append(float(fdatei[2]))
+				
+			if float(row[8]) < 10000.:
+				Bx.append(float(row[5]))
+				By.append(float(row[6]))
+				Bz.append(float(row[7]))
+				Btot.append(float(row[4]))
+				speed.append(float(row[8]))
+				density.append(float(row[9]))
+
+
 
 	#######################################################################
 	# Averages
@@ -178,17 +157,14 @@ def get_solar_wind_omni(input_file, start_date,first_read, last_date, Bx, By,Bz,
 		return()
 	
 	time_sw = last_date
-	print ('Speed  ', speed)
 	lead_time = int(1.5e6/(60*speed[-1]))
-	print ('Lead time (minutes)  ',lead_time/60.)
+	print ('Lead time (minutes)  ',lead_time)
 	
 	forecast_time = time_sw + dt.timedelta(minutes = lead_time)
 	
 	sw_avg = { 'current_time' : current_time, 'time_latest_solar_wind' : last_date,  'forecast_time': forecast_time, 'Bx' : Bx_avg, 'By' : By_avg, 'Bz' : Bz_avg, 'B_average' : Btot_avg, 'v' : speed_avg, 'ni' : den_avg }
 	
-	
-#	print (sw_avg)
-#	quit()
+
 	
 	return sw_avg,	last_date, Bx, By,Bz, Btot, density, speed
 

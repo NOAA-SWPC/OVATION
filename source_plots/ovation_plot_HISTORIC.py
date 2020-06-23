@@ -47,58 +47,48 @@ from kp_and_g_scale import kp_and_g_scale
 
 #  ***************** Set Run Parameters  *************************
 
-#Set mode to be NOWCAST or HISTORIC
-#Note:  FORECAST mode plots are made by a seperate program
+#Set mode to be HISTORIC
+#Note: FORECAST and NOWCAST modes required different plotting programs
 
 mode = 'HISTORIC'
 
 Home_path = os.environ.get('Home_path','./')
 Input_path = os.environ.get('Input_path','../output')
 Output_path = os.environ.get('Output_path','../output/'+mode+'/ovation_products/')
-Logo_path = os.environ.get('Logo_path','../logo/')
+Logo_path = os.environ.get('Logo_path','../source_plots/')
 
 Image_Output_path = Output_path + 'images/'
 Gridded_Output_path = Output_path  + 'gridded_text/'
 # HP_Output_path = Output_path + 'Text/Hemispheric_power/'
 
 os.makedirs(Output_path + 'images/', exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_path +'images/'))
+# print("making directory path (if necessary) {}".format(Output_path +'images/'))
 os.makedirs(Output_path + 'images/north/', exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_path +'images/north/'))
+# print("making directory path (if necessary) {}".format(Output_path +'images/north/'))
 os.makedirs(Output_path + 'images/south/', exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_path +'images/soutth/'))
+# print("making directory path (if necessary) {}".format(Output_path +'images/soutth/'))
 os.makedirs(Output_path + 'gridded_text/', exist_ok=True)
-print("making directory path (if necessary) {}".format(Output_path +'gridded_text/'))
+# print("making directory path (if necessary) {}".format(Output_path +'gridded_text/'))
 
-run_realtime = os.environ.get('run_realtime',True)   #If = True, then run once and use the standard "latest" file from the ovation model
 run_once = os.environ.get('run_once',False)  #If = True, then only plot one map or one pair of maps if plot_south = 1
 plot_south = os.environ.get('plot_south',True)    #if = False, then north only, if = 1, then include southern hemispher plots
 output_global_ascii = os.environ.get('output_globa_ascii',True)   # Set this to True to get gridded ASCII output of global aurora distribution
-subset = os.environ.get('subset',True)	#If subset = True and mode = 'HISTORIC' then priocess only a suybset of the data
 #  ******************************   To look at a subset of the output from the model  *********************
 
-if mode == 'HISTORIC' and subset == True:
-	start_date = os.environ.get('start_date', '09-03-2017 00:00')
-	start_date = dt.datetime.strptime(start_date, '%m-%d-%Y %H:%M')
-	end_date = os.environ.get('end_date', '09-10-2017 00:00')
-	end_date = dt.datetime.strptime(end_date, '%m-%d-%Y %H:%M')
-	cadence = os.environ.get('cadence', 30)   #Cadence in Minutes
+start_date = os.environ.get('start_date', '09-05-2017 00:00')
+start_date = dt.datetime.strptime(start_date, '%m-%d-%Y %H:%M')
+end_date = os.environ.get('end_date', '09-10-2017 00:00')
+end_date = dt.datetime.strptime(end_date, '%m-%d-%Y %H:%M')
 
-	print ("Processing only a subset between ",start_date," and ",end_date)
+
+print ("Processing only a subset between ",start_date," and ",end_date)
 # *  *************************************************************
 
-if mode == 'NOWCAST':
-	run_once = True
-	plot_south = True
-	create_json = True
-	nloops = 1
-	Input_path = Input_path + '/NOWCAST/model_output/'
-	
-if mode == 'HISTORIC':
-	run_once = False
-	plot_south = False
-	create_json = False
-	Input_path = Input_path + '/HISTORIC/model_output/'
+run_once = False
+plot_south = False
+create_json = True
+
+Input_path = Input_path + '/HISTORIC/model_output/'
 
 ins = 1
 if plot_south == True:
@@ -144,36 +134,29 @@ for NS in range(ins):
 
 	imin = 0
 	ihour = 0
+
+		
+	file_list = []
 	
+	ipath = Input_path + 'north/'
+	if NS == 1: ipath = Input_path + 'north/'
 	
-	if mode == 'HISTORIC':
+	for file in os.listdir(ipath):
+		file_list = np.append(file_list, file)
+		nloops = np.size(file_list)
 		
-		file_list = []
-		
-		ipath = Input_path + 'north/'
-		if NS == 1: ipath = Input_path + 'north/'
-		
-		for file in os.listdir(ipath):
-			file_list = np.append(file_list, file)
-			nloops = np.size(file_list)
-			
 # 			nloops = 1		# debug mode
 
 	
 	for iloop in range(nloops):
-		
-
-		if mode == 'NOWCAST':
-			in_file = Input_path + ifl + '_.txt'
-			input_file = open(in_file, 'r')				
-			print ("Input File   ", in_file)	
-            
-		else:		
-			in_file = file_list[iloop]
-			input_file = open(ipath + in_file, 'r')				
-			print ("Input File   ", ipath+in_file)		
+				
+		in_file = file_list[iloop]
+		input_file = open(ipath + in_file, 'r')				
+		print ("Input File   ", ipath+in_file)		
 		
 	#  Read Input File and Parse Critical Variables
+	
+		nhead = input_file.readline()  #Skip line with model run time... not relevant for HISTORIC mode
 		
 	# 	Parse Measurement Time
 	
@@ -193,6 +176,7 @@ for NS in range(ins):
 		dec_time = float(mhour) + float(mminute)/60.
 	
 		mdate = dt.datetime(myear, mmonth, mday, mhour, mminute)
+	
 		
 		if mdate >= start_date and mdate <= end_date: 
 	# 	lt_date = dt.datetime(myear, mmonth, mday,mhour)
@@ -429,37 +413,17 @@ HPI: %5.1f GW (Range 5 to 200)'\
 			file_date = syear + '-' + smonth + '-' + sday + '_' + shour + sminute
 			
 		
-		#
-		# ***********************   Add NOAA Logo  to image  **************************		
-		#
-		# ***********************    Save in a temp file and then read it back in as an image   **************************
-		# 			This is the only way I could figure out how to add the NOAA logo (a jpeg file) to the aurora map
-		#
-		
-		
-			
-			ofile_image = Image_Output_path+"temp1.png"
-			plt.savefig(ofile_image ,facecolor = 'black', edgecolor = 'black',bbox_inches = 'tight', pad_inches = 0,dpi=DPInch)
-			plt.clf()
-			im = Image.open(ofile_image)	
-			os.remove(ofile_image)
+#
+# ***********************   Add NOAA Logo  to image  **************************		
 		
 			icon = Image.open(Logo_path + "NOAA_logo4.png")
-			icon_size = (70,70)
+			
+			height = icon.size[1]
+			icon = np.array(icon).astype(np.float) / 255
 		
-			icon2 = icon.resize(icon_size)
-			xs,ys = icon2.size
-		
-		
-		# 		#NOAA logo position
-			x0 = 0
-			y0 = 7
-			x1 = x0+xs
-			y1 = y0+ys
-		
-			im.paste(icon2, (x0,y0,x1,y1), icon2)
-			im = im.convert('RGB')  #Converting from RGBA to RGB so that it can be saved as a jpg
-		
+			newax = fig.add_axes([0., .9, 0.1, 0.1], anchor='NE', zorder=-1)
+			newax.imshow(icon)
+			newax.axis('off')
 			
 		#  ******************   Save North and South Image Files   *******************************	
 			
@@ -473,16 +437,16 @@ HPI: %5.1f GW (Range 5 to 200)'\
 		
 			
 		
-		#   *******************************Save Final Image to "Latest Image" File and Final file****************************************
+		#   *******************************Save Final Image ****************************************
 		
 		
 			ofile_image = Image_Output_path+ofl
-			im.save(ofile_image ,facecolor = 'black', edgecolor = 'black',bbox_inches = 'tight', pad_inches = 0) 
-			if mode == 'NOWCAST':
-				ofile_image_latest = Image_Output_path+ofl_latest
-				im.save(ofile_image_latest ,facecolor = 'black', edgecolor = 'black',bbox_inches = 'tight', pad_inches = 0)
+			plt.savefig(ofile_image ,facecolor = 'black',dpi=DPInch)
+			
+			plt.close()	
+		# 	im.close()
 		
-			im.close()
+			input_file.close()
 		#   **************************   Call output_geojson subroutine    *************************
 			
 		if create_json: 

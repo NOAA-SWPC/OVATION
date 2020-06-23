@@ -33,7 +33,7 @@ from season_epoch_Kp import season_epoch_Kp
 from Hemispheric_Power import Hemispheric_Power
 from write_ascii_file import write_ascii_file
 from get_solar_wind_historic_data_new import get_solar_wind_historic_data
-from get_solar_wind_omni import get_solar_wind_omni
+from get_solar_wind_omni_2 import get_solar_wind_omni
 from rem_out import rem_out
 from write_HP_file_model import write_HP_file
 
@@ -51,7 +51,7 @@ from write_HP_file_model import write_HP_file
 #	Reads these data from the SWPC online database
 
 
-mode = os.environ.get('mode', 'NOWCAST')
+mode = os.environ.get('mode', 'HISTORIC')
 
 print("mode is: {}".format(mode))
 
@@ -67,20 +67,24 @@ header_path = os.environ.get('header_path', '../SW_Data/Header_Text/')
 
 Output_path = os.environ.get('Output_path', '../output/')
 
-input_file_historic = os.environ.get('input_file_historic', 'Historic_SW_Data/sw_data_2017_Sept.dat')
+#  NOWCAST Mode Inputs
 
 urlpath = os.environ.get('urlpath', 'http://services.swpc.noaa.gov/products/solar-wind/')
 
 
-start_date = os.environ.get('start_date', '09-03-2017 00:00')
+#HISTORIC Mode Inputs
+
+input_file_historic = os.environ.get('input_file_historic', 'Historic_SW_Data/OMNI_Subset_2017_Sept.dat')
+
+start_date = os.environ.get('start_date', '09-05-2017 00:00')
 start_date = datetime.datetime.strptime(start_date, '%m-%d-%Y %H:%M')
 end_date = os.environ.get('end_date', '09-10-2017 01:00')
 end_date = datetime.datetime.strptime(end_date, '%m-%d-%Y %H:%M')
-cadence = os.environ.get('cadence', 30)   #Cadence in Minutes
+cadence = os.environ.get('cadence', 5)   #Cadence in Minutes
 
 #Set Run Option Flags
 
-Omni = os.environ.get('Omni', False)  #If, True, then use OMNI data... otherwise use a flat file
+Omni = os.environ.get('Omni', True)  #If, True, then use OMNI data... otherwise use a flat file
 NorthSouth = os.environ.get('NorthSouth', True)  #If True then plot both hemisphereal
 HPI_output = os.environ.get('HPI_output', True)  # If True then output Hemispheric Power Index to a file
 aurora_output = os.environ.get('aurora_output', True)  # If True, the output the aurora ASCII file
@@ -108,25 +112,6 @@ if HPI_output:
 if mode == 'FORECAST':
 	os.system('rm ' + Output_Path_text + 'north/*.txt')
 	os.system('rm ' + Output_Path_text + 'south/*.txt')
-
-if mode == 'HISTORIC':
-	print('Do you want to delete existing files from previous runs?')
-
-	answer = None
-	while answer not in ("yes", "no"):
-		answer = input("Enter yes or no: ")
-		if answer == "yes":
-			os.system('rm ' + Output_Path_text + 'north/*.txt')
-			os.system('rm ' + Output_Path_text + 'south/*.txt')
-			os.system('rm ' + HP_Output_path + '*.txt')
-		elif answer == "no":
-			print("May overwrite or append to existing files")
-		else:
-			print("Please enter yes or no.")
-			
-# os.system('rm ' + Output_Path_text + 'north/*.txt')
-# os.system('rm ' + Output_Path_text + 'south/*.txt')
-# os.system('rm ' + HP_Output_path + '*.txt')
 
 #  nloops is the number of times the model will be run (times 2 for North and South)
 #	  HISTORIC mode it will depend on length of period and cadence
