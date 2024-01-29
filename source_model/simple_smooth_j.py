@@ -6,12 +6,14 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 
 def simple_smooth_j(j_call):
-	
-	j_smootha = j_call
-	
-	#~ j_smootha = 1.2* gaussian_filter(j_call,sigma = 3,mode = 'wrap')
 
-	return j_smootha
+    return
+
+    j_smootha = j_call
+
+    #~ j_smootha = 1.2* gaussian_filter(j_call,sigma = 3,mode = 'wrap')
+
+    return j_smootha
 
     #~ nmlt = 96
     #~ nmlat = 160

@@ -99,13 +99,13 @@ def compute_lag(v_sw, jtime, gse_x, gse_y):
 
 def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 
-	#current date of realtime observations
-	current_time = time
-	current_date = current_time.strftime('%Y%m%d') # text file format
-	#how long before the observation
-	minutes_before = 270 # 4.5 hours;
-	start_time = current_time - datetime.timedelta(minutes=minutes_before)
-	end_time = current_time
+    #current date of realtime observations
+    current_time = time
+    current_date = current_time.strftime('%Y%m%d') # text file format
+    #how long before the observation
+    minutes_before = 270 # 4.5 hours;
+    start_time = current_time - datetime.timedelta(minutes=minutes_before)
+    end_time = current_time
 
 ##############################################################
 # get realtime solar wind data between start_time and end_time
@@ -113,39 +113,39 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 
 # 1 day data
 
-	file_mag = 'mag-1-day.json'
-	file_plasma = 'plasma-1-day.json'
+    file_mag = 'mag-1-day.json'
+    file_plasma = 'plasma-1-day.json'
 
-	url_mag = urlpath + file_mag
-	url_plasma = urlpath + file_plasma
+    url_mag = urlpath + file_mag
+    url_plasma = urlpath + file_plasma
 
-	response = requests.get(url_mag)
-	data_mag = response.json()
+    response = requests.get(url_mag)
+    data_mag = response.json()
 
-	#~ with urllib.request.urlopen(url_mag) as response:
-		#~ data_mag = response.read()
-		#~ data_mag = json.loads(data_mag)
+    #~ with urllib.request.urlopen(url_mag) as response:
+        #~ data_mag = response.read()
+        #~ data_mag = json.loads(data_mag)
 
-	time_sw = []
-	Bx = []
-	By = []
-	Bz = []
-	n = len(data_mag)
+    time_sw = []
+    Bx = []
+    By = []
+    Bz = []
+    n = len(data_mag)
 
-	for i in range(1,n-1): # because first line is header
-		temp = str(data_mag[i][0])
-		time = (datetime.datetime(int(temp[0:4]), int(temp[5:7]), int(temp[8:10]), int(temp[11:13]), int(temp[14:16])))
-		if time > start_time and time < current_time:
-			# time array for solar wind data to be extracted
-			time_sw.append(time)
-			# magnetic field
-			Bx.append(float(data_mag[i][1]))
-			By.append(float(data_mag[i][2]))
-			Bz.append(float(data_mag[i][3]))
+    for i in range(1,n-1): # because first line is header
+        temp = str(data_mag[i][0])
+        time = (datetime.datetime(int(temp[0:4]), int(temp[5:7]), int(temp[8:10]), int(temp[11:13]), int(temp[14:16])))
+        if time > start_time and time < current_time:
+            # time array for solar wind data to be extracted
+            time_sw.append(time)
+            # magnetic field
+            Bx.append(float(data_mag[i][1]))
+            By.append(float(data_mag[i][2]))
+            Bz.append(float(data_mag[i][3]))
 
-	Bx = np.asarray(Bx)
-	By = np.asarray(By)
-	Bz = np.asarray(Bz)
+    Bx = np.asarray(Bx)
+    By = np.asarray(By)
+    Bz = np.asarray(Bz)
 
     # checking for no data values and setting them to nans
     #ind_nodata = np.where(dsflag_mag!=0) #flag 9 means no data
@@ -153,91 +153,91 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
     #By[ind_nodata] = np.nan
     #Bz[ind_nodata] = np.nan
     
-	response = requests.get(url_plasma)
-	data_plasma = response.json()
-	
-	#~ response = request.urlopen(url_plasma)
-	#~ data_plasma = response.read()
-	#~ data_plasma = json.loads(data_plasma)
-
-	density = []
-	speed = []
-	n = len(data_plasma)
+    response = requests.get(url_plasma)
+    data_plasma = response.json()
     
-	for i in range(1,n): # because first line is header
-		temp = str(data_plasma[i][0])
-		time = (datetime.datetime(int(temp[0:4]), int(temp[5:7]), int(temp[8:10]), int(temp[11:13]), int(temp[14:16])))
-		if time > start_time and time < current_time:
-			# density and speed
-			if data_plasma[i][2] is not None and data_plasma[i][1] is not None:
-#				print(i,data_plasma[i][1],data_plasma[i][2])
-				density.append(float(data_plasma[i][1]))
-				speed.append(float(data_plasma[i][2]))
-			# break when array sizes are the same.. writing time to files differs by 1 minute
-			if len(density) == len(Bx):
-				break
+    #~ response = request.urlopen(url_plasma)
+    #~ data_plasma = response.read()
+    #~ data_plasma = json.loads(data_plasma)
 
-	density = np.asarray(density)
-	speed = np.asarray(speed)
-	
+    density = []
+    speed = []
+    n = len(data_plasma)
+    
+    for i in range(1,n): # because first line is header
+        temp = str(data_plasma[i][0])
+        time = (datetime.datetime(int(temp[0:4]), int(temp[5:7]), int(temp[8:10]), int(temp[11:13]), int(temp[14:16])))
+        if time > start_time and time < current_time:
+            # density and speed
+            if data_plasma[i][2] is not None and data_plasma[i][1] is not None:
+#               print(i,data_plasma[i][1],data_plasma[i][2])
+                density.append(float(data_plasma[i][1]))
+                speed.append(float(data_plasma[i][2]))
+            # break when array sizes are the same.. writing time to files differs by 1 minute
+            if len(density) == len(Bx):
+                break
+
+    density = np.asarray(density)
+    speed = np.asarray(speed)
+    
 
     #print 'Array lengths', len(Bx), len(speed), len(density)
 
     # when no realtime solar wind data available, stop the code
-#	print(len(Bx),len(density))
-	if len(Bx) == 0 or len(density) == 0 or len(speed) == 0:
-		print('No realtime solar wind data available... Aborting...')
-		return
-		# maybe use Kp index here...
+#   print(len(Bx),len(density))
+    if len(Bx) == 0 or len(density) == 0 or len(speed) == 0:
+        print('No realtime solar wind data available... Aborting...')
+        return
+        # maybe use Kp index here...
 
 
     ##################################################
     # get L1 solar wind satellitle locations - DSCOVER
     ##################################################
 
-	file_loc = 'ephemerides.json'
-	url_loc = urlpath + file_loc
-	
-	response = requests.get(url_loc)
-	data_loc = response.json()	
+    file_loc = 'ephemerides.json'
+    url_loc = urlpath + file_loc
+    
+    response = requests.get(url_loc)
+    data_loc = response.json()  
 
-	#~ response = urllib.request.urlopen(url_loc)
-	#~ data_loc = response.read()
-	#~ data_loc = json.loads(data_loc)
+    #~ response = urllib.request.urlopen(url_loc)
+    #~ data_loc = response.read()
+    #~ data_loc = json.loads(data_loc)
 
-	Re = 6378. # Earth radius (km) for location units in Earth radii
-	current_hour = datetime.datetime(current_time.year, current_time.month, current_time.day, current_time.hour)
+    Re = 6378. # Earth radius (km) for location units in Earth radii
+    current_hour = datetime.datetime(current_time.year, current_time.month, current_time.day, current_time.hour)
 
-	time_arr = []
-	n = len(data_loc)
-	for i in range(1,n-1): # because first line is header
-		temp = str(data_loc[i][0])
-		time_arr.append( datetime.datetime(int(temp[0:4]), int(temp[5:7]), int(temp[8:10]), int(temp[11:13]), int(temp[14:16])))
+    time_arr = []
+    n = len(data_loc)
+    for i in range(1,n-1): # because first line is header
+        temp = str(data_loc[i][0])
+        time_arr.append( datetime.datetime(int(temp[0:4]), int(temp[5:7]), int(temp[8:10]), int(temp[11:13]), int(temp[14:16])))
 
     #print 'Current hour/Time array', current_hour, time_a
-	if current_hour in time_arr:
-		ind = time_arr.index( current_hour )
-		time_loc = time_arr[ind]
-		gse_x = float(data_loc[ind][1])/Re
-		gse_y = float(data_loc[ind][2])/Re
-			
-		# get previous row of solar wind locations; one hour earlier for interpolation purpose
-		before_time_loc = time_arr[ind-1]
-		before_gse_x = float(data_loc[ind-1][1])/Re
-		before_gse_y = float(data_loc[ind-1][2])/Re
-			
+    if current_hour in time_arr:
+        ind = time_arr.index( current_hour )
+        time_loc = time_arr[ind]
+        gse_x = float(data_loc[ind][1])/Re
+        gse_y = float(data_loc[ind][2])/Re
+            
+        # get previous row of solar wind locations; one hour earlier for interpolation purpose
+        before_time_loc = time_arr[ind-1]
+        before_gse_x = float(data_loc[ind-1][1])/Re
+        before_gse_y = float(data_loc[ind-1][2])/Re
+            
     # if location at current time not available:
     # get latest available location; locations in Earth radii
-	else:
-		print('No real time location available, getting latest available spacecraft location...')
-		time_loc = time_arr[-1]
-		gse_x = float(data_loc[-1][1])/Re
-		gse_y = float(data_loc[-1][2])/Re
-			
-		# get previous row of solar wind locations; one hour earlier for interpolation purpose
-		before_time_loc = time_arr[-2]
-		before_gse_x = float(data_loc[-2][1])/Re
-		before_gse_y = float(data_loc[-2][2])/Re
+    else:
+        print('No real time location available, getting latest available spacecraft location...')
+        time_loc = time_arr[-1]
+        gse_x = float(data_loc[-1][1])/Re
+        gse_y = float(data_loc[-1][2])/Re
+            
+        # get previous row of solar wind locations; one hour earlier for interpolation purpose
+        before_time_loc = time_arr[-2]
+        before_gse_x = float(data_loc[-2][1])/Re
+        before_gse_y = float(data_loc[-2][2])/Re
 
 
 
@@ -251,15 +251,15 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
     # new function here: compute_lag
 
     # if before and after x coordinates are the same, no interp needed
-	if gse_x == before_gse_x:
-		gse_x_interp = np.zeros(len(speed)) + gse_x
-	else:
-		gse_x_interp = np.linspace( gse_x, before_gse_x, len(speed) )
+    if gse_x == before_gse_x:
+        gse_x_interp = np.zeros(len(speed)) + gse_x
+    else:
+        gse_x_interp = np.linspace( gse_x, before_gse_x, len(speed) )
     # if before and after y coordinates are the same, no interp needed
-	if gse_y == before_gse_y:
-		gse_y_interp = np.zeros(len(speed)) + gse_y
-	else:
-		gse_y_interp = np.linspace( gse_y, before_gse_y, len(speed) )
+    if gse_y == before_gse_y:
+        gse_y_interp = np.zeros(len(speed)) + gse_y
+    else:
+        gse_y_interp = np.linspace( gse_y, before_gse_y, len(speed) )
 
 
     #######################################################################
@@ -271,60 +271,60 @@ def swpc_get_solar_wind_realtime_data_json(urlpath, mode, time):
 
 
     # seconds to impact Earth from Now
-	time_diff = []
+    time_diff = []
     #print time_sw
-	for i in time_sw:
-		time_diff.append((1/60.)*((current_time - i).seconds)) #current time changes every second
-	time_diff = np.array(time_diff)
+    for i in time_sw:
+        time_diff.append((1/60.)*((current_time - i).seconds)) #current time changes every second
+    time_diff = np.array(time_diff)
 
 
     # time of latest solar wind observation
-	time_latest_solar_wind = time_sw[-1]
-	solar_wind_minute_latent = (1/60.) * (current_time-time_latest_solar_wind).seconds
+    time_latest_solar_wind = time_sw[-1]
+    solar_wind_minute_latent = (1/60.) * (current_time-time_latest_solar_wind).seconds
 
-	print ('Time latest solar wind ',time_latest_solar_wind)
-	print('Data Latency (minutes) ' , solar_wind_minute_latent)
-	
-	
-	n_hours = 4 # data averaged over 4 hourly bins
-	Bx_average = []
-	By_average = []
-	Bz_average = []
-	Bmag_avg = []
-	v_avg = []
-	density_avg = []
-# 	sec_avg = []
-	for i in range(n_hours):
-# 		idx_hour = np.where( np.logical_and( seconds_to_impact >= (seconds_epoch-(i+1)*60), seconds_to_impact<(seconds_epoch-(i)*60) ) )
+    print ('Time latest solar wind ',time_latest_solar_wind)
+    print('Data Latency (minutes) ' , solar_wind_minute_latent)
+    
+    
+    n_hours = 4 # data averaged over 4 hourly bins
+    Bx_average = []
+    By_average = []
+    Bz_average = []
+    Bmag_avg = []
+    v_avg = []
+    density_avg = []
+#   sec_avg = []
+    for i in range(n_hours):
+#       idx_hour = np.where( np.logical_and( seconds_to_impact >= (seconds_epoch-(i+1)*60), seconds_to_impact<(seconds_epoch-(i)*60) ) )
 
-		idx_hour = np.where( np.logical_and( (time_diff - time_diff[-1]) >= ((i)*60.), (time_diff - time_diff[-1]) <((i+1)*60.) ) )
+        idx_hour = np.where( np.logical_and( (time_diff - time_diff[-1]) >= ((i)*60.), (time_diff - time_diff[-1]) <((i+1)*60.) ) )
 
-		Bx_average.append( np.nanmean(Bx[idx_hour]) ) # excluding nans
-		By_average.append( np.nanmean(By[idx_hour]) )
-		Bz_average.append( np.nanmean(Bz[idx_hour]) )
-		Bmag_avg.append( np.sqrt( Bx_average[i]**2 + By_average[i]**2 + Bz_average[i]**2 ))
-		v_avg.append( np.nanmean(speed[idx_hour]) )
-		density_avg.append( np.nanmean(density[idx_hour]) )
-# 		sec_avg.append( np.nanmean(seconds_to_impact[idx_hour]) )
-		
-		
+        Bx_average.append( np.nanmean(Bx[idx_hour]) ) # excluding nans
+        By_average.append( np.nanmean(By[idx_hour]) )
+        Bz_average.append( np.nanmean(Bz[idx_hour]) )
+        Bmag_avg.append( np.sqrt( Bx_average[i]**2 + By_average[i]**2 + Bz_average[i]**2 ))
+        v_avg.append( np.nanmean(speed[idx_hour]) )
+        density_avg.append( np.nanmean(density[idx_hour]) )
+#       sec_avg.append( np.nanmean(seconds_to_impact[idx_hour]) )
+        
+        
         # FORECAST mode?
         # forecast window average uses first hour of data
-# 		if i==0:
-# 			forecast_avg = np.average( delta_t[idx_hour] - solar_wind_seconds_latent )/60
-# 			forecast_min = np.min( delta_t[idx_hour] - solar_wind_seconds_latent )/60
-# 			forecast_max = np.max( delta_t[idx_hour] - solar_wind_seconds_latent )/60
-# 			forecast_std = np.std( delta_t[idx_hour] - solar_wind_seconds_latent )/60
+#       if i==0:
+#           forecast_avg = np.average( delta_t[idx_hour] - solar_wind_seconds_latent )/60
+#           forecast_min = np.min( delta_t[idx_hour] - solar_wind_seconds_latent )/60
+#           forecast_max = np.max( delta_t[idx_hour] - solar_wind_seconds_latent )/60
+#           forecast_std = np.std( delta_t[idx_hour] - solar_wind_seconds_latent )/60
 
 
-	lead_time = int(1.5e6/v_avg[-1])
-	print ('Lead time (minutes)  ',int(lead_time/60.))
-	forecast_time = time_sw[-1] + datetime.timedelta(seconds = lead_time)
+    lead_time = int(1.5e6/v_avg[-1])
+    print ('Lead time (minutes)  ',int(lead_time/60.))
+    forecast_time = time_sw[-1] + datetime.timedelta(seconds = lead_time)
 
-	
+    
     # final solar wind data structure
-#	sw_avg = { 'current_time' : current_time, 'time_latest_solar_wind' : time_latest_solar_wind, 'Bx' : Bx_average, 'By' : By_average, 'Bz' : Bz_average, 'B_average' : Bmag_avg, 'v' : v_avg, 'ni' : density_avg }
-	sw_avg = { 'current_time' : current_time, 'time_latest_solar_wind' : time_latest_solar_wind,  'forecast_time': forecast_time, 'Bx' : Bx_average, 'By' : By_average, 'Bz' : Bz_average, 'B_average' : Bmag_avg, 'v' : v_avg, 'ni' : density_avg }
+#   sw_avg = { 'current_time' : current_time, 'time_latest_solar_wind' : time_latest_solar_wind, 'Bx' : Bx_average, 'By' : By_average, 'Bz' : Bz_average, 'B_average' : Bmag_avg, 'v' : v_avg, 'ni' : density_avg }
+    sw_avg = { 'current_time' : current_time, 'time_latest_solar_wind' : time_latest_solar_wind,  'forecast_time': forecast_time, 'Bx' : Bx_average, 'By' : By_average, 'Bz' : Bz_average, 'B_average' : Bmag_avg, 'v' : v_avg, 'ni' : density_avg }
 
-	return sw_avg
+    return sw_avg
 

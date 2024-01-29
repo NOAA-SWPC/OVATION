@@ -88,14 +88,14 @@ plq3 = ("%s AND %s ORDER BY [time_tag]" % (start_time , end_time))
 
 
 if SD > TD:
-	querym = mlq1+mlq2+mlq3
-	queryp = plq1+plq2+plq3	
-	
+    querym = mlq1+mlq2+mlq3
+    queryp = plq1+plq2+plq3 
+    
 if ED < TD:
-	querym = meq1+meq2+meq3
-	queryp = peq1+peq2+peq3
-	
-	
+    querym = meq1+meq2+meq3
+    queryp = peq1+peq2+peq3
+    
+    
 #  ****************   Get Mag Data   *************************
 
 print (querym)
@@ -113,15 +113,15 @@ Glat = []
 Glon = []
 
 while row:
-	mdate.append(row[0])
-	Bx = np.append(Bx,row[1])
-	By = np.append(By,row[2])
-	Bz = np.append(Bz,row[3])
-	Btot = np.append(Btot,row[4])
-	#~ Glat = np.append(Glat,row[5])
-	#~ Glon = np.append(Glon,row[6])
+    mdate.append(row[0])
+    Bx = np.append(Bx,row[1])
+    By = np.append(By,row[2])
+    Bz = np.append(Bz,row[3])
+    Btot = np.append(Btot,row[4])
+    #~ Glat = np.append(Glat,row[5])
+    #~ Glon = np.append(Glon,row[6])
 
-	row = cursor.fetchone()
+    row = cursor.fetchone()
 
 #  ****************   Get Solar Wind Data   *************************
 
@@ -137,12 +137,12 @@ N = []
 
 
 while row:
-	if row[1]:
-		pdate.append(row[0])
-		V = np.append(V,row[1])
-		N = np.append(N,row[2])
+    if row[1]:
+        pdate.append(row[0])
+        V = np.append(V,row[1])
+        N = np.append(N,row[2])
 
-	row = cursor.fetchone()
+    row = cursor.fetchone()
 
 
 #*********************************************************************
@@ -154,21 +154,21 @@ ip = 0
 
 for i1 in range(0,len(mdate)-1):
 
-	if mdate[im] == pdate[ip]:
-		mtime = mdate[im].strftime("%Y-%m-%d %H:%M:%S")
-		ptime = pdate[ip].strftime("%Y-%m-%d %H:%M:%S") 
-		#~ print (' %20s %8.4e  %8.4e  %8.4e  %8.4e  %8.4e  %8.4e  %8.4e   %8.4e \n' %(mtime, Bx[im], By[im], Bz[im], Btot[im], V[ip], N[ip], Glat[im], Glon[im]))
-		#~ ofile.write(' %20s %8.4e  %8.4e  %8.4e  %8.4e  %8.4e  %8.4e  %8.4e   %8.4e \n' %(mtime, Bx[im], By[im], Bz[im], Btot[im], V[ip], N[ip], Glat[im], Glon[im]))
-		if N[ip]: ofile.write(' %20s %8.4e  %8.4e  %8.4e  %8.4e  %8.4e   %8.4e \n' %(mtime, Bx[im], By[im], Bz[im], Btot[im], V[ip], N[ip]))
-		im = im+1
-		ip = ip+1
-	else:
-		mtime = mdate[im].strftime("%Y-%m-%d %H:%M:%S")
-		ptime = pdate[ip].strftime("%Y-%m-%d %H:%M:%S") 
-		if mdate[im] < pdate[ip]:
-			im=im+1
-		elif mdate[im]> pdate[ip]:
-			ip = ip+1
+    if mdate[im] == pdate[ip]:
+        mtime = mdate[im].strftime("%Y-%m-%d %H:%M:%S")
+        ptime = pdate[ip].strftime("%Y-%m-%d %H:%M:%S") 
+        #~ print (' %20s %8.4e  %8.4e  %8.4e  %8.4e  %8.4e  %8.4e  %8.4e   %8.4e \n' %(mtime, Bx[im], By[im], Bz[im], Btot[im], V[ip], N[ip], Glat[im], Glon[im]))
+        #~ ofile.write(' %20s %8.4e  %8.4e  %8.4e  %8.4e  %8.4e  %8.4e  %8.4e   %8.4e \n' %(mtime, Bx[im], By[im], Bz[im], Btot[im], V[ip], N[ip], Glat[im], Glon[im]))
+        if N[ip]: ofile.write(' %20s %8.4e  %8.4e  %8.4e  %8.4e  %8.4e   %8.4e \n' %(mtime, Bx[im], By[im], Bz[im], Btot[im], V[ip], N[ip]))
+        im = im+1
+        ip = ip+1
+    else:
+        mtime = mdate[im].strftime("%Y-%m-%d %H:%M:%S")
+        ptime = pdate[ip].strftime("%Y-%m-%d %H:%M:%S") 
+        if mdate[im] < pdate[ip]:
+            im=im+1
+        elif mdate[im]> pdate[ip]:
+            ip = ip+1
 
 
 
